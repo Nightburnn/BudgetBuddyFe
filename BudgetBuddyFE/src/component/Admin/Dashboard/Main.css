@@ -1,0 +1,419 @@
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+ 
+ 
+  overflow-x: hidden;
+  font-size: 14px;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.sidebar {
+  width: 200px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color:rgb(230, 227, 227);
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar .profile-pic {
+  width: 60px;
+  border-radius: 50%;
+}
+
+.sidebar ul {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.sidebar ul li a {
+  color: rgb(255, 249, 249);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 8px 15px;
+  display: block;
+  transition: all 0.3s ease, transform 0.3s ease;
+}
+.sidebar ul li a:hover {
+  transform: translate(-3px); /* Moves to the right and lifts */
+  background-color: #707072;
+  color: #070641;
+  box-shadow: 5px 8px 10px rgba(26, 25, 25, 0.2); /* Creates a shadow effect */
+}
+
+
+.logout {
+  margin-top: auto;
+  padding: 15px;
+  border-top: 1px solid #3a3a3a;
+  text-align: center;
+}
+
+/* Custom scrollbar styling */
+
+.table-responsive {
+  width: 100%;
+  background-color: #d8d8d8;
+  border-radius: 8px;
+  padding: 10px;
+  max-height: 300px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  table-layout: fixed;
+}
+.table-responsive::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #eaeaea;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #4a4a6a;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #5a5a7a;
+}
+
+.table th,
+.table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table th {
+  background-color: #292940;
+  color: #0e0c0c;
+  padding: 16px;
+  text-align: left;
+}
+
+.table td {
+  background-color: #252535;
+  color: rgb(255, 255, 255);
+  padding: 8px 10px;
+  border-bottom: 1px solid #444;
+}
+.table tbody tr:hover {
+  background-color: #33334d;
+}
+
+.team-tag {
+  padding: 3px 6px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.75rem;
+}
+
+.team-tag.marketing {
+  background-color: #4caf50;
+}
+.team-tag.sales {
+  background-color: #ff5722;
+}
+.team-tag.operations {
+  background-color: #9c27b0;
+}
+.team-tag.finance {
+  background-color: #03a9f4;
+}
+
+.content {
+  margin-left: 200px;
+  padding-top: 0;
+  background-color: #1a1a1f;
+  min-height: 100vh;
+  width: calc(100% - 200px);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  padding: 10px 20px;
+}
+
+.card {
+  background-color:rgb(19, 19, 19);
+  border: none;
+  color: #fff;
+  margin-bottom: 1rem;
+  overflow: hidden; /* Ensure content stays within card boundaries */
+}
+
+.monthly-report .row {
+  position: relative;
+}
+
+.monthly-report .col-md-6:first-child {
+  position: relative;
+}
+
+.monthly-report .col-md-6:first-child::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background-color: #444;
+}
+
+.dashboard-container .header {
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  width: 100%; /* Adjusts width to account for sidebar */
+  padding: 10px 20px;
+  background-color: #212529; /* Set a background color for clarity */
+}
+
+/* Adjust content margin to avoid overlap */
+.content {
+  margin-top: 50px; /* Add margin to prevent overlap with fixed header */
+}
+
+.card-header {
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+#team-spending-chart,
+#day-to-day-chart {
+  height: 200px;
+}
+
+.quick-access .btn {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+/* Mobile styling */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .content {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    max-height: none;
+  }
+
+  .quick-access .btn {
+    width: 48%;
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-report .col-md-6:first-child::after {
+    display: none; /* Remove divider on mobile */
+  }
+
+  .container-fluid {
+    padding: 15px;
+    overflow-x: hidden; /* Prevent horizontal scroll on container */
+  }
+
+  .monthly-report {
+    margin: 0 15px; /* Add margin to keep card within container */
+  }
+
+  .table {
+    min-width: 600px; /* Ensure table has minimum width for scrolling */
+  }
+
+  .table th,
+  .table td {
+    min-width: 120px; /* Minimum width for cells */
+  }
+
+  .table th:first-child,
+  .table td:first-child {
+    min-width: 150px; /* More space for subject column */
+  }
+
+  .team-tag {
+    white-space: nowrap; /* Prevent team tags from breaking */
+  }
+
+  .card-body {
+    padding: 10px; /* Reduce padding on mobile */
+  }
+}
+
+/* Custom scrollbar styling */
+.table-responsive::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #1e1e2f;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #4a4a6a;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #5a5a7a;
+}
+.sidebar ul li {
+  margin-bottom: 5px;
+}
+
+.sidebar ul .active {
+  background-color: #2b2f3a;
+  padding: 8px 0;
+}
+
+.sidebar ul .active a {
+  color: #da93e6;
+}
+
+.list-group-item {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+
+.container-fluid {
+  padding: 15px;
+}
+/* Pending Tasks Card Styling */
+.pending-tasks .list-group-item {
+  padding: 12px 16px; /* Increased padding top/bottom and left/right */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #3a3a3a; /* Subtle separator */
+}
+
+.pending-tasks .list-group {
+  padding: 8px 0; /* Add some space around the entire list */
+}
+
+.pending-tasks .list-group-item:last-child {
+  border-bottom: none; /* Remove border from last item */
+}
+
+.pending-tasks .list-group-item:hover {
+  background-color: #333340; /* Subtle hover effect */
+}
+
+/* Style for the numbers/values */
+.pending-tasks .list-group-item span {
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #2d2d3d; /* Subtle background for numbers */
+}
+
+/* Add some breathing room in the card body */
+.pending-tasks .card-body {
+  padding: 0; /* Remove default padding */
+}
+
+/* Maintain consistent spacing on mobile */
+@media (max-width: 768px) {
+  .pending-tasks .list-group-item {
+    padding: 12px 16px; /* Keep the same padding on mobile */
+  }
+  .recent-expenses {
+    margin-top: 10px;
+  }
+  .profile {
+    margin-top: 70px !important;
+  }
+
+  .container-fluid {
+    margin-top: 40px;
+  }
+}
+
+.bi-list {
+  color: #fff;
+  font-size: 35px;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+
+/*******************************Notification**********************/
+.right .bg-white {
+    background-color: #2b2f3a !important ;
+    color: #fff;
+  }
+ 
+  
+  .osahan-post-header .btn-group .btn {
+    color: #ffffff;
+    background-color: #333333;
+  }
+  
+  .osahan-post-header .btn-group .btn:hover {
+    background-color: #555555;
+  }
+  
+  .dropdown-menu {
+    background-color: #333333;
+    border: none;
+  }
+  
+  .dropdown-menu .dropdown-item {
+    color: #ffffff;
+  }
+  
+  .dropdown-menu .dropdown-item:hover {
+    background-color: #555555;
+  }
+  
+  .text-muted {
+    color: #bbbbbb !important;
+  }
+  
+  .border-bottom {
+    border-color: #444444 !important;
+  }

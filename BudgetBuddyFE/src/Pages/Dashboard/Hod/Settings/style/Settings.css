@@ -1,0 +1,131 @@
+
+  .settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .settings-title {
+    color:  #1A1A1A;
+
+/* 16/500 */
+font-family: 'Manrope';
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 24px */
+letter-spacing: -0.32px;
+    color: #333;
+    margin: 0;
+  }
+  
+  .edit-button {
+    border-radius: 100px;
+border: 1px solid #F1F1F1;
+    color: #1A1A1A;
+    text-align: center;
+    
+    /* 14/400 */
+    font-family: 'Manrope';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%; /* 21px */
+    letter-spacing: -0.28px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover {
+    color: #343a40;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .setting-form  .form-label {
+    display: block;
+    color: #1A1A1A;
+    font-family: 'Manrope';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 150%; /* 24px */
+    letter-spacing: -0.32px;
+    margin-bottom: 8px;
+  }
+  
+ .setting-form  .form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    
+    box-shadow: 0 0 0 2px rgba(102, 16, 242, 0.2);
+  }
+  
+  .password-display {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  
+  .cancel-button {
+    border-radius: 100px;
+    border: 1px solid #F1F1F1;
+    cursor: pointer;
+    padding: 8px 16px;
+    color: #1A1A1A;
+text-align: center;
+background: #fff;
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+  }
+  
+  .cancel-button:hover {
+    color: #343a40;
+  }
+  
+  .save-button {
+    border-radius: 100px;
+    background:  #723FEB;
+        border: none;
+        color:  #FFF;
+        text-align: center;
+        
+        /* 14/400 */
+        font-family: 'Manrope';
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 150%; /* 21px */
+        letter-spacing: -0.28px;
+    padding: 8px 16px;
+   
+    cursor: pointer;
+  }
+  
+  .save-button:hover {
+    background-color: #520dc2;
+  }
+
+ 

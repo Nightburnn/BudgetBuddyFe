@@ -1,0 +1,270 @@
+.search-budget-input-group {
+
+  display: flex;
+  align-items: center;
+  border-radius: 100px;
+  padding: 0 16px;
+  border: 1px solid #0c0909;
+  background: #FFF;
+
+}
+
+/* Add to your existing CSS */
+/* Modal Backdrop */
+.budget-modal .modal-backdrop.show {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+/* Modal Container */
+.budget-list-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Dialog */
+.budget-list-modal .modal-dialog {
+  max-width: 350px;
+  /* Adjust width as needed */
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+/* Modal Content */
+.budget-list-modal .modal-content {
+  border-radius: 8px;
+  border: none;
+  background-color: #ffffff;
+}
+
+/* Modal Picture */
+.budget-list-modal .modal-pic {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f1ecfd;
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.budget-list-modal .modal-body h3 {
+  color: #171414;
+  text-align: center;
+
+  /* 16/500 */
+  font-family: 'Manrope';
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  /* 24px */
+  letter-spacing: -0.32px;
+}
+
+.budget-list-modal .modal-body p {
+  color: #707070;
+  text-align: center;
+
+  /* 14/400 */
+  font-family: 'Manrope';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 21px */
+  letter-spacing: -0.28px;
+}
+
+/* Buttons */
+
+.budget-list-modal .modal-body .btn {
+  border-radius: 100px;
+  padding: 6px 16px;
+
+}
+
+.budget-list-modal .modal-body .btn-light {
+  border: 1px solid #EBEBEB;
+  background-color: white;
+  color: #171414;
+  text-align: center;
+
+  /* 14/400 */
+  font-family: 'Manrope';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 21px */
+  letter-spacing: -0.28px;
+}
+
+.btn-light:hover {
+  background-color: #f8f9fa;
+}
+
+.btn-view {
+  background: #723FEB;
+  border: none;
+  color: #FFF;
+  text-align: center;
+
+  /* 14/400 */
+  font-family: 'Manrope';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 21px */
+  letter-spacing: -0.28px;
+}
+
+.btn-view:hover {
+  background-color: #5e37c2;
+}
+
+.btn-link {
+  color: #1A1A1A !important;
+
+}
+
+
+.create-budget-btn {
+  border-radius: 64px;
+  background: #723FEB;
+  padding: 8px 16px;
+  color: #FFF;
+  text-align: center;
+  font-family: 'Manrope';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 24px */
+  letter-spacing: -0.32px;
+}
+
+.create-budget-btn:hover {
+
+  background: #723FEB;
+  color: #fff;
+}
+
+
+@media screen and (max-width: 767px) {
+  .budget-list-row .col {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .budget-list-row .d-flex.align-items-center.gap-4 {
+    width: 100%;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .budget-list-row h2 {
+    text-align: center;
+  }
+
+  .search-budget-input-group {
+    width: 100% !important;
+    margin: 0 0 15px 0 !important;
+  }
+
+  .budget-list-row .col> :last-child {
+    align-self: center;
+  }
+}
+
+
+/*admin budget list*/
+/* Custom Dropdown Styles */
+.custom-dropdown {
+  position: relative;
+}
+
+.custom-dropdown-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-dropdown-toggle::after {
+  display: none;
+  /* Remove default dropdown arrow */
+}
+
+.custom-dropdown-menu {
+  min-width: 100px;
+  /* Reduce width */
+  padding: 0;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.custom-dropdown-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  color: #1A1A1A;
+  font-family: 'Manrope';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  /* 18px */
+  letter-spacing: -0.24px;
+}
+
+.custom-dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #1A1A1A;
+
+}
+
+.custom-dropdown-item:not(:last-child) {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.budget-list-modal .modal-pic-approve {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #4CAF50;
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.budget-list-modal .modal-pic-reject {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #D32F2F;
+  margin: 0 auto;
+  padding: 8px;
+}

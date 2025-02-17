@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 24px;
+            background-color: #f9f9f9;
+            font-family: 'Manrope', sans-serif;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #DFE2E2;
+            padding: 32px;
+        }
+        
+        .header {
+            color: #1A1A1A;
+            font-family: 'Poppins', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 150%;
+            letter-spacing: -0.4px;
+            margin: 0 0 16px 0;
+        }
+        
+        .divider {
+            border-bottom: 1px solid #723FEB;
+            margin: 0 0 24px 0;
+        }
+        
+        .content {
+            color: #131515;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 150%;
+            letter-spacing: -0.28px;
+        }
+        
+        .content p {
+            margin: 16px 0;
+        }
+        
+        .button-container {
+            margin: 32px 0;
+        }
+        
+        .button {
+            display: block;
+            background-color: #723FEB;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease;
+        }
+        
+        .button:hover {
+            background-color: #6235d0;
+        }
+        span{
+            color:  #6A6A6A;
+
+/* 14/500 */
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+        }
+        
+        .footer p{
+            color:  #131515;
+
+font-family: 'Manrope';
+font-size: 15px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+        }
+        .footer {
+margin: 0 auto;            
+color: #748181;
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+           
+            max-width: 650px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h1 class="header">BudgetBuddy</h1>
+        <div class="divider"></div>
+        <div class="content">
+            <p>Hello Kofo,</p>
+            <p>Congratulations!!!</p>
+            <p>You have been approved by the administrator. Click the button below to view your dashboard</p>
+            <div class="button-container">
+                <a href="{{ dashboard_link }}" class="button">View</a>
+            </div>
+          
+                <p> <span>Thanks,</span>
+                    <br>The BudgetBuddy Team</p>
+           
+        </div>
+    </div>
+    <footer class="footer">
+        <p><strong>About BudgetBuddy</strong></p> 
+         BudgetBuddy is an accounting tool that enables easy management and overseeing of organizational budgets. This tool enables organization of budgets by department, as well as expense logging for accountability. An added feature is the creation of reminders for recurrent expenses.
+     </footer>
+</body>
+</html>

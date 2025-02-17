@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Approval Email</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        body {
+            margin: 0;
+            padding: 5px;
+            background-color: #f9f9f9;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            border-radius: 8px;
+border: 1px solid  #DFE2E2;
+padding: 40px;
+background: #FFF;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            color:  #1A1A1A;
+font-family: 'Poppins';
+font-size: 20px;
+font-style: normal;
+font-weight: 700;
+line-height: 150%; /* 30px */
+letter-spacing: -0.4px;
+            margin-bottom: 10px;
+        }
+        .divider {
+            border-bottom: 1px solid  #723FEB;
+        margin: 10px 0;
+        }
+        .content {
+            color:#131515;
+
+/* 14/500 */
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+            line-height: 1.5;
+        }
+        .footer {
+margin: 0 auto;            
+color: #748181;
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+           
+            max-width: 650px;
+        }
+        span{
+            color:  #6A6A6A;
+
+/* 14/500 */
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+        }
+        .footer p{
+            color:  #131515;
+
+font-family: 'Manrope';
+font-size: 15px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h3 class="header">BudgetBuddy</h3>
+        <div class="divider"></div>
+        <div class="content">
+            <p>Hello {{ name }},</p>
+            <p>Your sign-up details have been sent to the administrator for approval. You will receive an email soon stating whether you have been approved or not.</p>
+            <p>Thank you for your patience.</p>
+            <p> <span>Thanks,</span>
+            <br>The BudgetBuddy Team</p>
+        </div>
+       
+    </div>
+    <footer class="footer">
+       <p><strong>About BudgetBuddy</strong></p> 
+        BudgetBuddy is an accounting tool that enables easy management and overseeing of organizational budgets. This tool enables organization of budgets by department, as well as expense logging for accountability. An added feature is the creation of reminders for recurrent expenses.
+    </footer>
+</body>
+</html>

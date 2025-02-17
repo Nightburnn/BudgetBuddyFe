@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+
+.notifi-head  .btn-link{
+  border-radius: 100px;
+background: #F6F6F6;
+text-decoration: none;
+padding: 4px 12px;
+color:  #1A1A1A;
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+}
+
+.notifi-head h6{
+  color: #1A1A1A;
+  font-family: 'Manrope';
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.32px;
+}
+.topic{
+  color: #1A1A1A;
+font-family: 'Manrope';
+font-size: 16px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 24px */
+letter-spacing: -0.32px;
+}
+
+.notification-item h6{
+  color: #1A1A1A;
+font-family: 'Manrope';
+font-size: 16px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 24px */
+letter-spacing: -0.32px;
+}
+.notification-item p{
+  color:  #6A6A6A;
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%;
+letter-spacing: -0.28px;
+}
+.notification-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 100px;
+border: 1px solid #F1F1F1;
+background: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background-color: #dc3545;
+  border-radius: 50%;
+}
+
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #171414;
+  opacity: 0.3;
+  z-index: 1040;
+}
+
+.notification-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 576px) {
+  .notification-panel {
+    width: 100%;
+  }
+}
+
+.notification-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.notification-item {
+  position: relative;
+  padding-left: 24px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.notification-dot-indicator {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.notification-item.recent .notification-dot-indicator {
+  background-color: #0d6efd;
+}
+
+.notification-item.older .notification-dot-indicator {
+  background-color: #6c757d;
+}
+
+.notification-time {
+  display: flex;
+  align-items: center;
+  color: #1A1A1A;
+  font-family: 'Manrope';
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 18px */
+  letter-spacing: -0.24px;
+}
+
+.time-separator {
+  width: 4px;
+  height: 1px;
+  background-color: #dee2e6;
+  margin: 0 8px;
+}

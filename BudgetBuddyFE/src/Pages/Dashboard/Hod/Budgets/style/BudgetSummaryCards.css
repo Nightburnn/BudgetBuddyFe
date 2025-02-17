@@ -1,0 +1,129 @@
+ .budget-summary-container {
+   padding: 15px;
+ }
+
+ .budget-card {
+   padding: 16px 20px;
+   border-radius: 12px;
+   height: 100%;
+ }
+
+ .budgetsum .card-content {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   gap: 16px;
+ }
+
+ .budgetsum .card-text {
+   display: flex;
+   flex-direction: column;
+   gap: 4px;
+ }
+
+ .budgetsum .card-count {
+   font-family: 'Manrope';
+   font-size: 20px;
+   font-style: normal;
+   font-weight: 500;
+   line-height: 150%;
+   /* 30px */
+   letter-spacing: -0.4px;
+   margin: 0;
+ }
+
+ .budgetsum .card-title {
+   font-family: 'Manrope';
+   font-size: 16px;
+   font-style: normal;
+   font-weight: 500;
+   line-height: 150%;
+   /* 21px */
+   letter-spacing: -0.28px;
+   margin: 0;
+   opacity: 0.9;
+ }
+
+ .budgetsum .card-icon {
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+
+ /* Status Cards Container */
+ .status-cards-container {
+   background: white;
+   border-radius: 12px;
+   border: 1px solid #E5E7EB;
+   height: 100%;
+ }
+
+ .status-card-col {
+   position: relative;
+   padding: 8px 12px;
+ }
+
+ .card-divider {
+   position: absolute;
+   right: 0;
+   top: 50%;
+   transform: translateY(-50%);
+   width: 1px;
+   height: 40px;
+   background-color: #E5E7EB;
+ }
+
+ /* Total Budgets Card */
+ .total-card {
+   background-color: #723FEB;
+   color: #FFF;
+ }
+
+ .total-card .card-icon {
+   background-color: rgba(245, 252, 254, 0.20);
+ }
+
+ /* Status Cards */
+ .pending-card .card-icon {
+   background-color: #FFF9E6;
+ }
+
+ .approved-card .card-icon {
+   background-color: #EDFFEE;
+ }
+
+ .rejected-card .card-icon {
+   background-color: #FEECEB;
+ }
+
+ /* Responsive Styles */
+ @media (max-width: 767.98px) {
+   .status-cards-container {
+     margin-top: 15px;
+   }
+
+   .status-card-col {
+     padding: 12px;
+   }
+
+   .budgetsum .card-count {
+     font-size: 20px;
+   }
+
+   .budgetsum .card-title {
+     font-size: 12px;
+   }
+
+   /* Remove dividers on mobile */
+   .card-divider {
+     display: none;
+   }
+
+   /* Add bottom border instead */
+   .status-card-col:not(:last-child) {
+     border-bottom: 1px solid #E5E7EB;
+   }
+ }

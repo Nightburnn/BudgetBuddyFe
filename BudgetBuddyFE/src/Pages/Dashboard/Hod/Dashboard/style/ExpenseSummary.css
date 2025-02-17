@@ -1,0 +1,168 @@
+.expense-wrapper {
+  --color-transportation: #F1BFBF;
+  --color-feeding: #D3C3F9;
+  --color-insurance: #CFF1FB;
+  --color-electricity: #FFECB2;
+}
+
+.expense-card {
+  border-radius: 8px;
+  border: 2px solid  #F1F1F1;
+  padding: 12px 16px;  
+  max-width: 600px;
+}
+
+/* Header styles */
+.expense-select {
+  min-width: 70px;   
+  padding: 4px 8px !important;  
+  border-radius: 16px;
+background:  #F1F1F1;
+color:  #1A1A1A;
+font-family: 'Manrope';
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%;
+letter-spacing: -0.24px;
+  cursor: pointer;
+}
+select:focus {
+  outline: none;
+  border: none;
+}
+.expense-wrapper h2{
+  color:  #1A1A1A;
+
+/* 14/500 */
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+}
+.expense-wrapper .chart-wrapper {
+  position: relative;
+  height: 180px;      
+}
+
+.expense-wrapper .center-total {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1;
+}
+
+.expense-wrapper .total-label {
+  color: #6A6A6A;
+
+  /* 14/400 */
+  font-family: 'Manrope';
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+  letter-spacing: -0.28px;
+  margin-bottom: 2px;  
+}
+
+.expense-wrapper .total-amount {
+  color:  #1A1A1A;
+
+/* 14/500 */
+font-family: 'Manrope';
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: 150%; /* 21px */
+letter-spacing: -0.28px;
+  margin: 0;
+}
+
+/* Expense items grid */
+.expense-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;           
+  padding-top: 16px;   
+}
+
+.expense-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;           
+}
+
+.expense-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;           
+}
+
+.expense-dot {
+  width: 6px;         
+  height: 6px;        
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.expense-dot.transportation { background-color: var(--color-transportation); }
+.expense-dot.feeding-cost { background-color: var(--color-feeding); }
+.expense-dot.insurance { background-color: var(--color-insurance); }
+.expense-dot.electricity-bills { background-color: var(--color-electricity); }
+
+.expense-name {
+  color:  #6A6A6A;
+
+/* 12/400 */
+font-family: 'Manrope';
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+}
+
+.expense-value {
+  color:  #1A1A1A;
+font-family: 'Manrope';
+font-size: 12px;
+font-style: normal;
+font-weight: 400;
+line-height: 150%; /* 18px */
+letter-spacing: -0.24px;
+  padding-left: 12px; 
+}
+
+.expense-wrapper .chart-tooltip {
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 4px;
+  padding: 6px 8px;   
+  color: white;
+}
+
+.expense-wrapper .chart-tooltip p {
+  margin: 0;
+  font-size: 12px;  
+  font-family: 'Manrope';
+}
+
+.expense-wrapper .pie-segment-hover {
+  filter: brightness(0.85);
+}
+
+@media (max-width: 768px) {
+  .expense-grid {
+    gap: 12px;        
+  }
+}
+
+
+/**Dashboardlayout****/
+.border{
+  border-bottom: 1px solid  #F1F1F1;
+background:#FFF;
+}

@@ -1,0 +1,21 @@
+.metric-card {
+  border-radius: 6px;
+  border: 1px solid #F1F1F1;
+  padding: 8px; /* Reduce padding */
+}
+
+.metric-card .card-body {
+  padding: 10px; /* Reduce padding inside */
+}
+
+.metric-card .card-title {
+  font-size: 12px; /* Reduce text size */
+  line-height: 140%; 
+  letter-spacing: -0.24px;
+}
+
+.metric-card .text-purple {
+  font-size: 14px; /* Reduce text size */
+  line-height: 140%;
+  letter-spacing: -0.28px;
+}
