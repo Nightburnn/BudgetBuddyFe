@@ -15,7 +15,6 @@ import BudgetLayout from "./Pages/Dashboard/Hod/Budgets/BudgetLayout";
 import RecurringLayout from "./Pages/Dashboard/Hod/RecurringExpenses/RecurringLayout";    
 import Settings from "./Pages/Dashboard/Hod/Settings/Settings";
 
-import AdminDashboardLayout from "./Pages/Dashboard/Admin/Dashboard/AdminDashboardLayout"
 
 
 
@@ -32,13 +31,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/sidebar" element={<Sidebar />} />
-
-
         <Route path="dashboard" element={<AppLayout />}>
           <Route index element={<DashboardLayout />} />
           <Route path="budgets" element={<BudgetLayout />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="recurring-expenses" element={<AdminDashboardLayout />} />
+          <Route path="recurring-expenses" element={<RecurringLayout />} />
 
         </Route>
 
