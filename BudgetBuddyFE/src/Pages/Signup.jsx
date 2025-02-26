@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { ToastContainer, toast } from "react-toastify";
@@ -7,6 +7,7 @@ import axios from "axios";
 import bb from "../assests/images/bb.png";
 
 const Signup = () => {
+  // Initial form state
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState(null);
   const [firstName, setFirstName] = useState("");
@@ -18,6 +19,14 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // OTP verification state
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [timer, setTimer] = useState(59);
+  const [showResend, setShowResend] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [otpError, setOtpError] = useState(false);
+  const otpRefs = useRef([]);
 
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
@@ -42,6 +51,24 @@ const Signup = () => {
     return passwordRegex.test(password);
   };
 
+  // OTP Timer effect
+  useEffect(() => {
+    let interval;
+    if (step === 4 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            setShowResend(true);
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
+
   const handleNext = () => {
     if (step === 1) {
       if (selectedRole === "admin") {
@@ -49,9 +76,11 @@ const Signup = () => {
       } else if (selectedRole === "hod") {
         setStep(2);
       }
-    }
-    if (step === 2 && isNextButtonEnabledStep2) {
+    } else if (step === 2 && isNextButtonEnabledStep2) {
       setStep(3);
+    } else if (step === 3 && isFormValidStep3) {
+      // Request OTP before proceeding to verification
+      handleSendOTP();
     }
   };
 
@@ -85,15 +114,97 @@ const Signup = () => {
 
   const handleRoleSelect = (role) => setSelectedRole(role);
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    if (!isFormValidStep3) return;
+  // Send OTP to user's email
+  const handleSendOTP = async () => {
+    try {
+      setIsLoading(true);
+      // Endpoint to request OTP
+      const response = await axios.post(`${API_URL}/auth/send-otp`, { email });
+      
+      if (response.data.success) {
+        toast.success("OTP sent to your email!");
+        setStep(4); // Move to OTP verification step
+        setTimer(59);
+        setShowResend(false);
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to send OTP. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  // Handle OTP input change
+  const handleOtpChange = (index, value) => {
+    if (value.length <= 1 && /^\d*$/.test(value)) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+      setOtpError(false);
+
+      if (value && index < 5) {
+        otpRefs.current[index + 1].focus();
+      }
+    }
+  };
+
+  // Verify OTP and complete signup
+  const handleVerifyOTP = async () => {
+    try {
+      setIsVerifying(true);
+      const otpString = otp.join('');
+      
+      // Verify OTP endpoint
+      const response = await axios.post(`${API_URL}/auth/verify-otp`, {
+        email,
+        otp: otpString
+      });
+      
+      if (response.data.success) {
+        // OTP verified, proceed with signup
+        await handleSignup();
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Invalid OTP. Please try again.";
+      toast.error(errorMessage);
+      setOtpError(true);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOTP = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/resend-otp`, { email });
+      
+      if (response.data.success) {
+        toast.success("New OTP sent successfully!");
+        setOtp(['', '', '', '', '', '']);
+        setTimer(59);
+        setShowResend(false);
+        setOtpError(false);
+      }
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to resend OTP. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+
+  // Complete signup after OTP verification
+  const handleSignup = async () => {
     try {
       setIsLoading(true);
 
+      const endpoint = selectedRole === "admin" 
+        ? `${API_URL}/auth/signup/admin` 
+        : `${API_URL}/auth/signup/hod`;
+
       const userData = {
-        role: selectedRole,
         email,
         password,
         ...(selectedRole === "hod" && {
@@ -103,9 +214,9 @@ const Signup = () => {
         }),
       };
 
-      const response = await axios.post(`${API_URL}/auth/signup`, userData);
+      const response = await axios.post(endpoint, userData);
 
-      if (response.data) {
+      if (response.data.success) {
         toast.success("Registration successful!");
         setTimeout(() => {
           window.location.href = "/login";
@@ -150,7 +261,7 @@ const Signup = () => {
         <div className="d-flex justify-content-center align-items-center mb-4">
           <div className="d-flex align-items-start gap-5">
             {step > 1 && (
-              <button onClick={handleBack} className="back-button  me-auto">
+              <button onClick={handleBack} className="back-button me-auto">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
@@ -272,7 +383,7 @@ const Signup = () => {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                requried
+                required
               />
             </div>
             <button
@@ -365,10 +476,61 @@ const Signup = () => {
                 isFormValidStep3 ? "active" : ""
               }`}
               disabled={!isFormValidStep3 || isLoading}
-              onClick={handleSignup}
+              onClick={handleNext}
             >
-              {isLoading ? <span>Signing up...</span> : "Signup"}
+              {isLoading ? <span>Sending OTP...</span> : "Next"}
             </button>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="form-step forgotpass">
+            <p className="text-center right mb-4 main-highlight">
+              Enter the 6-digit OTP sent to <span className="highlight-email">{email}</span>
+            </p>
+            <div className="d-flex justify-content-between mb-1">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (otpRefs.current[index] = el)}
+                  type="text"
+                  className={`form-control otp-input ${otpError ? 'invalid' : ''}`}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  placeholder="-"
+                  maxLength={1}
+                />
+              ))}
+            </div>
+            {otpError && (
+              <p className="text-danger mb-3">Incorrect code</p>
+            )}
+            <p className="text-center mb-3 mt-2">
+              {showResend ? (
+                <span className="main-highlight">
+                  Did not receive OTP? <span className="text-primary cursor-pointer" onClick={handleResendOTP}>Resend</span>
+                </span>
+              ) : (
+                <span className="main-highlight">
+                  Did not receive OTP? <span className="highlight-timer">Resend in {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</span>
+                </span>
+              )}
+            </p>
+            <button
+              className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') ? 'active' : ''}`}
+              onClick={handleVerifyOTP}
+              disabled={!otp.every(digit => digit !== '') || isLoading}
+            >
+              {isLoading ? <span>Verifying...</span> : "Verify & Complete Signup"}
+            </button>
+          </div>
+        )}
+
+        {isVerifying && (
+          <div className="modal-overlay">
+            <div className="modal-content-dark">
+              <p className="modal-text m-0">Verifying OTP...</p>
+            </div>
           </div>
         )}
 
