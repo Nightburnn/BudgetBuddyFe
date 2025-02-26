@@ -3,7 +3,7 @@ import DepartmentCards from './DepartmentCards';
 import DepartmentList from './DepartmentList';
 
 
-const DepartmentLayout = () => {
+const AdminDepartmentLayout = () => {
   return (
     <div className="container-fluid">
 
@@ -23,4 +23,4 @@ const DepartmentLayout = () => {
   );
 };
 
-export default DepartmentLayout;
+export default AdminDepartmentLayout;

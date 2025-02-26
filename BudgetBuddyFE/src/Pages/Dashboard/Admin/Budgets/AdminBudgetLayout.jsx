@@ -3,7 +3,7 @@ import BudgetSummary from './BudgetSummary';
 import BudgetList from './BudgetList';
 
 
-const BudgetLayout = () => {
+const AdminBudgetLayout = () => {
   return (
     <div className="container-fluid">
 
@@ -23,4 +23,4 @@ const BudgetLayout = () => {
   );
 };
 
-export default BudgetLayout;
+export default AdminBudgetLayout;

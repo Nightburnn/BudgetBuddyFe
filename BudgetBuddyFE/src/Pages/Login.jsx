@@ -2,96 +2,14 @@ import React, { useState } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Link, useNavigate } from "react-router-dom";
-import bb from "../assests/images/bb.png";
-
-const Login = () => {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate("/dashboard");
-  };
-
-  return (
-    <div className="signup-container d-flex flex-column flex-lg-row">
-      <div className="signup-image">
-        <img src={bb} alt="Safe" className="img-fluid" />
-      </div>
-
-      <div className="signup-form-container d-flex flex-column justify-content-center">
-        <div className="d-flex justify-content-center align-items-center mb-4">
-          <h2 className="text-center mb-0">Welcome Back!</h2>
-        </div>
-        <p className="text-center right">Login to your account</p>
-
-        <form onSubmit={handleLogin} className="form-step second">
-          <div className="form-group mb-3">
-            <label>Email Address</label>
-            <input
-              type="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="form-group password-field position-relative">
-            <label>Password</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <i
-              className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
-              onClick={() => setShowPassword(!showPassword)}
-            ></i>
-          </div>
-
-          <div className="d-flex justify-content-start mb-3 forgot mt-2">
-            Forgot Password?
-            <Link to="/forgot-password" className="forgot-password-link">
-              Reset
-            </Link>
-          </div>
-
-          <button type="submit" className="btn btn-primary w-100">
-            Login
-          </button>
-        </form>
-
-        <p className="auth-footer mt-3">
-          Don't have an account? <a href="/signup">Sign Up</a>
-        </p>
-      </div>
-    </div>
-  );
-};
-
-export default Login;
-
-
-
-
-/*import React, { useState } from "react";
-import "./Signup.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';  // Import these
-import 'react-toastify/dist/ReactToastify.css';         // Import the styles
+import { ToastContainer, toast } from 'react-toastify';  
+import 'react-toastify/dist/ReactToastify.css';         
 import bb from "../assests/images/bb.png";
+import { useAuth } from "../Auth/AuthContext"; 
 
 const Login = () => {
-  const navigate = useNavigate();
+  const { login } = useAuth(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -159,19 +77,32 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post('https://8895-102-216-11-2.ngrok-free.app/auth/login', {
         email,
         password
       });
 
       if (response.data.token) {
-        showSuccess("Login successful!");
+        // Store token
         localStorage.setItem('token', response.data.token);
         
-        // Short delay to show success message before redirect
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
+        // Extract user data from response (adjust according to your API response)
+        const userData = {
+          token: response.data.token,
+          email: email,
+          
+          role: response.data.role || "user",
+          name: response.data.name || "",
+          id: response.data.id || "",
+          // Add any other user details from response
+        };
+
+        showSuccess("Login successful!");
+        
+        // Use Auth Context login function
+        login(userData);
+        
+        // Note: No need for navigate here as it's handled by the login function
       }
     } catch (error) {
       if (error.response) {
@@ -200,7 +131,7 @@ const Login = () => {
 
   return (
     <div className="signup-container d-flex flex-column flex-lg-row">
-      {/* Add ToastContainer at the top level }
+      {/* Add ToastContainer at the top level */}
       <ToastContainer 
         position="top-right"
         autoClose={3000}
@@ -267,7 +198,6 @@ const Login = () => {
           >
             {isSubmitting ? (
               <div className="d-flex align-items-center justify-content-center">
-              
                 Logging in...
               </div>
             ) : (
@@ -284,4 +214,4 @@ const Login = () => {
   );
 };
 
-export default Login;*/
+export default Login;
