@@ -5,15 +5,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import bb from "../assests/images/bb.png";
 import "./Signup.css";
-
-const API_BASE_URL = 'http://your-api-url/api';
+import { API_URL } from '../config/api';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(600); 
   const [showResend, setShowResend] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [otpError, setOtpError] = useState(false);
@@ -53,36 +52,25 @@ const ForgotPassword = () => {
 
   const handleSendEmail = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email });
+      const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
       if (response.data.success) {
         toast.success('OTP sent to your email!');
         setStep(2);
+        setTimer(600); 
+        setShowResend(false);
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to send OTP. Please try again.');
     }
   };
 
-  const handleVerify = async () => {
-    setIsVerifying(true);
-    const otpString = otp.join('');
-    
-    try {
-      const response = await axios.post(`${API_BASE_URL}/verify-otp`, {
-        email,
-        otp: otpString
-      });
-      
-      if (response.data.success) {
-        toast.success('OTP verified successfully!');
-        setStep(3);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Invalid OTP. Please try again.');
-      setOtpError(true);
-    } finally {
-      setIsVerifying(false);
+  // We'll verify the OTP along with the password reset
+  const handleMoveToPasswordReset = () => {
+    if (otp.some(digit => digit === '')) {
+      toast.error('Please enter the complete OTP');
+      return;
     }
+    setStep(3);
   };
 
   const handleResetPassword = async () => {
@@ -91,8 +79,16 @@ const ForgotPassword = () => {
       return;
     }
 
+    // Check if OTP has expired
+    if (timer === 0) {
+      toast.error('OTP has expired. Please request a new one.');
+      setStep(2);
+      return;
+    }
+
+    setIsVerifying(true);
     try {
-      const response = await axios.post(`${API_BASE_URL}/reset-password`, {
+      const response = await axios.post(`${API_URL}/auth/reset-password`, {
         email,
         password,
         otp: otp.join('')
@@ -106,16 +102,24 @@ const ForgotPassword = () => {
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to reset password. Please try again.');
+      // If the error is related to OTP, go back to OTP screen
+      if (error.response?.data?.message?.toLowerCase().includes('otp')) {
+        setStep(2);
+        setOtpError(true);
+      }
+    } finally {
+      setIsVerifying(false);
     }
   };
 
   const handleResend = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/resend-otp`, { email });
+      // Reuse the forgot-password endpoint to resend the OTP
+      const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
       if (response.data.success) {
         toast.success('New OTP sent successfully!');
         setOtp(['', '', '', '', '', '']);
-        setTimer(59);
+        setTimer(600); 
         setShowResend(false);
         setOtpError(false);
       }
@@ -135,6 +139,12 @@ const ForgotPassword = () => {
         otpRefs.current[index + 1].focus();
       }
     }
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
   return (
@@ -204,19 +214,19 @@ const ForgotPassword = () => {
             )}
             <p className="text-center mb-3 mt-2">
               {showResend ? (
-                <span className="main-highlight">Did not receive OTP? <span className="text-primary cursor-pointer" onClick={handleResend}>Resend</span></span>
+                <span className="main-highlight">OTP expired. <span className="text-primary cursor-pointer" onClick={handleResend}>Resend OTP</span></span>
               ) : (
                 <span className="main-highlight">
-                  Did not receive OTP? <span className="highlight-timer">Resend in {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</span>
+                  OTP valid for: <span className="highlight-timer">{formatTime(timer)}</span>
                 </span>
               )}
             </p>
             <button
-              className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') ? 'active' : ''}`}
-              onClick={handleVerify}
-              disabled={!otp.every(digit => digit !== '')}
+              className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') && timer > 0 ? 'active' : ''}`}
+              onClick={handleMoveToPasswordReset}
+              disabled={!otp.every(digit => digit !== '') || timer === 0}
             >
-              Verify
+              Next
             </button>
           </div>
         )}
@@ -269,7 +279,7 @@ const ForgotPassword = () => {
         {isVerifying && (
           <div className="modal-overlay">
             <div className="modal-content-dark">
-              <p className="modal-text m-0">Verifying OTP...</p>
+              <p className="modal-text m-0">Verifying...</p>
             </div>
           </div>
         )}

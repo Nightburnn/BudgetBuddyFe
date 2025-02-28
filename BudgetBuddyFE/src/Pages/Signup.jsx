@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import bb from "../assests/images/bb.png";
+import { API_URL } from '../config/api';
 
 const Signup = () => {
   // Initial form state
@@ -22,13 +23,11 @@ const Signup = () => {
 
   // OTP verification state
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(59);
+  const [timer, setTimer] = useState(480);
   const [showResend, setShowResend] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [otpError, setOtpError] = useState(false);
   const otpRefs = useRef([]);
-
-  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,14 +35,14 @@ const Signup = () => {
   };
 
   const departments = [
-    "Human Resources",
-    "Information Technology",
-    "Finance",
-    "Marketing",
-    "Operations",
-    "Sales",
-    "Research & Development",
-    "Customer Service",
+    { id: 1, name: "Human Resources" },
+    { id: 2, name: "Information Technology" },
+    { id: 3, name: "Finance" },
+    { id: 4, name: "Marketing" },
+    { id: 5, name: "Operations" },
+    { id: 6, name: "Sales" },
+    { id: 7, name: "Research & Development" },
+    { id: 8, name: "Customer Service" }
   ];
 
   const validatePassword = (password) => {
@@ -79,8 +78,8 @@ const Signup = () => {
     } else if (step === 2 && isNextButtonEnabledStep2) {
       setStep(3);
     } else if (step === 3 && isFormValidStep3) {
-      // Request OTP before proceeding to verification
-      handleSendOTP();
+      // Proceed directly to signup instead of requesting OTP first
+      handleSignup();
     }
   };
 
@@ -101,40 +100,18 @@ const Signup = () => {
   const isFormValidStep3 =
     selectedRole === "admin"
       ? email.trim() !== "" &&
-        validateEmail(email) &&
-        password.trim() !== "" &&
-        confirmPassword.trim() !== "" &&
-        password === confirmPassword &&
-        validatePassword(password)
+      validateEmail(email) &&
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      password === confirmPassword &&
+      validatePassword(password)
       : department !== "" &&
-        password.trim() !== "" &&
-        confirmPassword.trim() !== "" &&
-        password === confirmPassword &&
-        validatePassword(password);
+      password.trim() !== "" &&
+      confirmPassword.trim() !== "" &&
+      password === confirmPassword &&
+      validatePassword(password);
 
   const handleRoleSelect = (role) => setSelectedRole(role);
-
-  // Send OTP to user's email
-  const handleSendOTP = async () => {
-    try {
-      setIsLoading(true);
-      // Endpoint to request OTP
-      const response = await axios.post(`${API_URL}/auth/send-otp`, { email });
-      
-      if (response.data.success) {
-        toast.success("OTP sent to your email!");
-        setStep(4); // Move to OTP verification step
-        setTimer(59);
-        setShowResend(false);
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to send OTP. Please try again.";
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Handle OTP input change
   const handleOtpChange = (index, value) => {
@@ -150,23 +127,37 @@ const Signup = () => {
     }
   };
 
-  // Verify OTP and complete signup
   const handleVerifyOTP = async () => {
     try {
       setIsVerifying(true);
       const otpString = otp.join('');
       
-      // Verify OTP endpoint
-      const response = await axios.post(`${API_URL}/auth/verify-otp`, {
+      const requestData = {
         email,
         otp: otpString
-      });
+      };
       
+      // Log what we're sending
+      console.log("Verifying OTP with data:", requestData);
+      console.log("OTP type:", typeof otpString);
+      console.log("Email type:", typeof email);
+      
+      // Use the verification endpoint
+      const response = await axios.post(`${API_URL}/auth/verify-otp`, requestData);
+      
+      console.log("Verification response:", response.data);
+  
       if (response.data.success) {
-        // OTP verified, proceed with signup
-        await handleSignup();
+        toast.success("Registration successful!");
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
       }
     } catch (error) {
+      console.error("OTP verification error:", error);
+      console.log("Error status:", error.response?.status);
+      console.log("Error data:", error.response?.data);
+      
       const errorMessage =
         error.response?.data?.message || "Invalid OTP. Please try again.";
       toast.error(errorMessage);
@@ -175,67 +166,80 @@ const Signup = () => {
       setIsVerifying(false);
     }
   };
+  
 
-  // Resend OTP
-  const handleResendOTP = async () => {
-    try {
-      const response = await axios.post(`${API_URL}/auth/resend-otp`, { email });
-      
-      if (response.data.success) {
-        toast.success("New OTP sent successfully!");
-        setOtp(['', '', '', '', '', '']);
-        setTimer(59);
-        setShowResend(false);
-        setOtpError(false);
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || "Failed to resend OTP. Please try again.";
-      toast.error(errorMessage);
+// Resend OTP
+const handleResendOTP = async () => {
+  try {
+    // Since the same endpoint only accepts email and OTP, for resend we'll 
+    // just send the email with an empty OTP string
+    const response = await axios.post(`${API_URL}/auth/password/verify-otp`, {
+      email,
+      otp: "" // Empty OTP to indicate this is a resend request
+    });
+
+    if (response.data.success) {
+      toast.success("New OTP sent successfully!");
+      setOtp(['', '', '', '', '', '']);
+      setTimer(480);
+      setShowResend(false);
+      setOtpError(false);
     }
-  };
-
-  // Complete signup after OTP verification
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || "Failed to resend OTP. Please try again.";
+    toast.error(errorMessage);
+  }
+};
+  // Initial signup process - registers user and triggers OTP generation
   const handleSignup = async () => {
     try {
       setIsLoading(true);
-
-      const endpoint = selectedRole === "admin" 
-        ? `${API_URL}/auth/signup/admin` 
+      console.log("Starting signup process...");
+  
+      // Use one of two signup endpoints based on role
+      const endpoint = selectedRole === "admin"
+        ? `${API_URL}/auth/signup/admin`
         : `${API_URL}/auth/signup/hod`;
-
+  
       const userData = {
         email,
         password,
         ...(selectedRole === "hod" && {
           firstName,
           lastName,
-          department,
-        }),
+          departmentId: parseInt(department, 10),
+                }),
       };
-
+  
+      console.log("Sending request to:", endpoint);
       const response = await axios.post(endpoint, userData);
-
-      if (response.data.success) {
-        toast.success("Registration successful!");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      }
+      console.log("Signup response:", response.data);
+  
+      // After successful signup, move to OTP verification regardless of response.data.success
+      setStep(4);
+      setTimer(480);
+      setShowResend(false);
+      toast.success("Registration initiated! Please verify your email with OTP.");
+      
     } catch (error) {
+      console.error("Error during signup:", error);
+      console.log("Error response:", error.response?.data);
+      
       const errorMessage =
-        error.response?.data?.message ||
-        "Registration failed. Please try again.";
+        error.response?.data?.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
-
-      if (error.response?.status === 409) {
-        toast.error("Email already exists. Please use a different email.");
-      } else if (error.response?.status === 400) {
-        toast.error("Invalid input. Please check your details.");
-      }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Always reset loading state
     }
+  };
+
+ 
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
   return (
@@ -286,9 +290,8 @@ const Signup = () => {
             <p className="form-label reg mb-3">I am registering as</p>
             <div className="form-group">
               <div
-                className={`option mb-3 ${
-                  selectedRole === "admin" ? "selected" : ""
-                }`}
+                className={`option mb-3 ${selectedRole === "admin" ? "selected" : ""
+                  }`}
                 onClick={() => handleRoleSelect("admin")}
               >
                 <span>Administrator</span>
@@ -344,9 +347,8 @@ const Signup = () => {
               </div>
             </div>
             <button
-              className={`btn btn-primary btn-block mt-4 ${
-                selectedRole ? "active" : ""
-              }`}
+              className={`btn btn-primary btn-block mt-4 ${selectedRole ? "active" : ""
+                }`}
               onClick={handleNext}
               disabled={!selectedRole}
             >
@@ -387,9 +389,8 @@ const Signup = () => {
               />
             </div>
             <button
-              className={`btn btn-primary btn-block mt-4 ${
-                isNextButtonEnabledStep2 ? "active" : ""
-              }`}
+              className={`btn btn-primary btn-block mt-4 ${isNextButtonEnabledStep2 ? "active" : ""
+                }`}
               onClick={handleNext}
               disabled={!isNextButtonEnabledStep2}
             >
@@ -408,11 +409,12 @@ const Signup = () => {
                   value={department}
                   onChange={(e) => setDepartment(e.target.value)}
                 >
-                  <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
+                 
+                   <option value="">Select Department</option>
+                   {departments.map((dept) => (
+                     <option key={dept.id} value={dept.id}>
+                       {dept.name}
+                     </option>
                   ))}
                 </select>
               </div>
@@ -443,9 +445,8 @@ const Signup = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <i
-                className={`bi ${
-                  showPassword ? "bi-eye-slash" : "bi-eye"
-                } toggle-password`}
+                className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"
+                  } toggle-password`}
                 onClick={() => setShowPassword(!showPassword)}
               ></i>{" "}
             </div>
@@ -460,9 +461,8 @@ const Signup = () => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
               />
               <i
-                className={`bi ${
-                  showConfirmPassword ? "bi-eye-slash" : "bi-eye"
-                } toggle-password`}
+                className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"
+                  } toggle-password`}
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               ></i>
             </div>
@@ -472,13 +472,12 @@ const Signup = () => {
             </p>
 
             <button
-              className={`btn btn-primary btn-block mt-3 ${
-                isFormValidStep3 ? "active" : ""
-              }`}
+              className={`btn btn-primary btn-block mt-3 ${isFormValidStep3 ? "active" : ""
+                }`}
               disabled={!isFormValidStep3 || isLoading}
               onClick={handleNext}
             >
-              {isLoading ? <span>Sending OTP...</span> : "Next"}
+              {isLoading ? <span>Signing Up...</span> : "Sign Up"}
             </button>
           </div>
         )}
@@ -507,21 +506,19 @@ const Signup = () => {
             )}
             <p className="text-center mb-3 mt-2">
               {showResend ? (
-                <span className="main-highlight">
-                  Did not receive OTP? <span className="text-primary cursor-pointer" onClick={handleResendOTP}>Resend</span>
-                </span>
+                <span className="main-highlight">OTP expired. <span className="text-primary cursor-pointer" onClick={handleResendOTP}>Resend</span></span>
               ) : (
                 <span className="main-highlight">
-                  Did not receive OTP? <span className="highlight-timer">Resend in {String(Math.floor(timer / 60)).padStart(2, '0')}:{String(timer % 60).padStart(2, '0')}</span>
+                  OTP valid for: <span className="highlight-timer">{formatTime(timer)}</span>
                 </span>
               )}
             </p>
             <button
               className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') ? 'active' : ''}`}
               onClick={handleVerifyOTP}
-              disabled={!otp.every(digit => digit !== '') || isLoading}
+              disabled={!otp.every(digit => digit !== '') || isVerifying}
             >
-              {isLoading ? <span>Verifying...</span> : "Verify & Complete Signup"}
+              {isVerifying ? <span>Verifying...</span> : "Verify"}
             </button>
           </div>
         )}

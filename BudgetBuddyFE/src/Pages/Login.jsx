@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';  
 import 'react-toastify/dist/ReactToastify.css';         
 import bb from "../assests/images/bb.png";
 import { useAuth } from "../Auth/AuthContext"; 
+import { API_URL } from '../config/api';
+
 
 const Login = () => {
   const { login } = useAuth(); 
@@ -53,7 +55,6 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     
-    // Validation checks with toast notifications
     if (!email.trim()) {
       showError("Email is required");
       return;
@@ -77,32 +78,30 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post('https://8895-102-216-11-2.ngrok-free.app/auth/login', {
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password
       });
+
+      console.log("Login response:", response.data);
 
       if (response.data.token) {
         // Store token
         localStorage.setItem('token', response.data.token);
         
-        // Extract user data from response (adjust according to your API response)
         const userData = {
           token: response.data.token,
           email: email,
-          
-          role: response.data.role || "user",
-          name: response.data.name || "",
-          id: response.data.id || "",
-          // Add any other user details from response
+          role: response.data.role || "user", 
         };
 
+        console.log("User data to be saved:", userData);
+        
         showSuccess("Login successful!");
         
-        // Use Auth Context login function
-        login(userData);
-        
-        // Note: No need for navigate here as it's handled by the login function
+        setTimeout(() => {
+          login(userData);
+        }, 3000); 
       }
     } catch (error) {
       if (error.response) {
@@ -117,13 +116,14 @@ const Login = () => {
             showError("Too many login attempts. Please try again later");
             break;
           default:
-            showError("An error occurred during login. Please try again");
+            showError(`Login failed: ${error.response.data.message || "Unknown error"}`);
         }
       } else if (error.request) {
         showError("Unable to connect to the server. Please check your internet connection");
       } else {
         showError("An unexpected error occurred. Please try again");
       }
+      console.error("Login error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +198,7 @@ const Login = () => {
           >
             {isSubmitting ? (
               <div className="d-flex align-items-center justify-content-center">
-                Logging in...
+                Logging in....
               </div>
             ) : (
               'Login'
