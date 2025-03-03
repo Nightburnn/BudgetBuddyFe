@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { API_URL } from '../../../../config/api';
+
 
 const CreateDepartment = () => {
   const [showModal, setShowModal] = useState(false);
   const [departmentName, setDepartmentName] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -13,26 +16,78 @@ const CreateDepartment = () => {
     setIsFormValid(value.trim() !== '');
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting department:', departmentName);
-    toast.success('Department created successfully!', {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-    });
-    setShowModal(false);
-    setDepartmentName('');
+  const handleSubmit = async () => {
+    if (!isFormValid) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Prepare data in the format expected by the backend
+      const requestData = {
+        departments: [departmentName]
+      };
+      
+      // Replace with your actual API endpoint
+      const response = await fetch(`${API_URL}/departments/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add any auth headers if needed
+          // 'Authorization': 'Bearer YOUR_TOKEN'
+        },
+        body: JSON.stringify(requestData)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to create department: ${response.status} ${response.statusText}`);
+      }
+      
+      // Check if there's content before trying to parse JSON
+      const contentType = response.headers.get('content-type');
+      let data;
+      
+      if (contentType && contentType.includes('application/json') && response.status !== 204) {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : {};
+      } else {
+        // Handle non-JSON or empty responses
+        data = { success: true };
+      }
+      
+      console.log('API Response:', data);
+      
+      toast.success('Department created successfully!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      
+      setShowModal(false);
+      setDepartmentName('');
+    } catch (error) {
+      console.error('Error creating department:', error);
+      toast.error(error.message || 'Failed to create department. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-
   return (
     <>
-       <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
@@ -75,7 +130,7 @@ const CreateDepartment = () => {
                       className="form-control"
                       value={departmentName}
                       onChange={handleInputChange}
-                      placeholder="Enter name of expense"
+                      placeholder="Enter department name"
                     />
                   </div>
                 </form>
@@ -84,11 +139,11 @@ const CreateDepartment = () => {
               <div className="modal-footer">
                 <button
                   type="button"
-                  className={`btn btn-send ${!isFormValid ? 'disabled' : ''}`}
-                  disabled={!isFormValid}
+                  className={`btn btn-send ${!isFormValid || isLoading ? 'disabled' : ''}`}
+                  disabled={!isFormValid || isLoading}
                   onClick={handleSubmit}
                 >
-                  Save
+                  {isLoading ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>

@@ -1,7 +1,46 @@
-import React from 'react';
-import "./Styles/BudgetCostComponent.css"
+import React, { useState, useEffect } from 'react';
+import "./Styles/BudgetCostComponent.css";
+import { API_URL } from '../../../../config/api';
+
 
 const BudgetCostComponent = () => {
+  // State to store the budget total from API
+  const [budgetTotal, setBudgetTotal] = useState("Loading...");
+  // State to track loading status
+  const [isLoading, setIsLoading] = useState(true);
+  // State to track any error
+  const [error, setError] = useState(null);
+
+  // Fetch data from API when component mounts
+  useEffect(() => {
+    const fetchBudgetTotal = async () => {
+      try {
+        setIsLoading(true);
+        // Replace with your actual API endpoint
+        const response = await fetch(`${API_URL}/admin/dashboard/get-budget-statistics`);
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        
+        setBudgetTotal(data.total || "N 0 K");
+        setError(null);
+      } catch (err) {
+        console.error("Failed to fetch budget total:", err);
+        setError("Failed to load budget data");
+        // Set a fallback value or keep the loading state
+        setBudgetTotal("N/A");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBudgetTotal();
+  }, []); // Empty dependency array means this effect runs once on mount
+
   return (
     <div className="container budget-cost-container">
       <div className="left-content">
@@ -22,11 +61,15 @@ const BudgetCostComponent = () => {
       <div className="total-container">
         <div className="total-circle">
           <span className="total-label">Total</span>
-          <span className="total-amount">N 480 K</span>
+          {isLoading ? (
+            <span className="total-amount loading">Loading...</span>
+          ) : error ? (
+            <span className="total-amount error">{error}</span>
+          ) : (
+            <span className="total-amount">{budgetTotal}</span>
+          )}
         </div>
       </div>
-
-     
     </div>
   );
 };

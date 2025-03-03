@@ -74,27 +74,27 @@ const Login = () => {
       showError("Password must be at least 6 characters");
       return;
     }
-
+  
     setIsSubmitting(true);
-
+  
     try {
       const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password
       });
-
+  
       console.log("Login response:", response.data);
-
+  
       if (response.data.token) {
         // Store token
         localStorage.setItem('token', response.data.token);
         
+       
         const userData = {
-          token: response.data.token,
-          email: email,
-          role: response.data.role || "user", 
+          ...response.data,
+          email: email 
         };
-
+  
         console.log("User data to be saved:", userData);
         
         showSuccess("Login successful!");

@@ -14,22 +14,39 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
-      setCurrentUser(JSON.parse(user));
+      try {
+        const parsedUser = JSON.parse(user);
+        console.log("User loaded from localStorage:", parsedUser);
+        setCurrentUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user from localStorage:", error);
+        localStorage.removeItem("user");
+      }
     }
     setLoading(false);
   }, []);
 
-  // Login function
+  // Login function that preserves the original login response
   const login = (userData) => {
+    console.log("Original login response:", userData);
+    
+    // IMPORTANT: Store the original response directly without modification
     localStorage.setItem("user", JSON.stringify(userData));
     setCurrentUser(userData);
     
-    // Redirect based on role
-    if (userData.role === "admin") {
+    // Double-check what was stored
+    console.log("User stored in localStorage:", JSON.parse(localStorage.getItem("user")));
+    
+    // Redirect based on roles or isAdmin flag
+    if (userData.isAdmin === true || 
+        (userData.roles && userData.roles.includes("ROLE_ADMIN"))) {
+      console.log("Redirecting to admin dashboard");
       navigate("/dashboard");
-    } else if (userData.role === "hod") {
+    } else if (userData.roles && userData.roles.includes("ROLE_HOD")) {
+      console.log("Redirecting to HOD dashboard");
       navigate("/dashboard");
     } else {
+      console.log("Redirecting to home page");
       navigate("/");
     }
   };
@@ -41,13 +58,22 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  // Check user role
+  // Check if user is admin - check both isAdmin flag and roles array
   const isAdmin = () => {
-    return currentUser?.role === "admin";
+    console.log("Checking isAdmin. Current user:", currentUser);
+    const result = currentUser?.isAdmin === true || 
+                   (currentUser?.roles && 
+                    Array.isArray(currentUser.roles) && 
+                    currentUser.roles.includes("ROLE_ADMIN"));
+    console.log("isAdmin result:", result);
+    return result;
   };
 
+  // Check if user is HOD
   const isHOD = () => {
-    return currentUser?.role === "hod";
+    return currentUser?.roles && 
+           Array.isArray(currentUser.roles) && 
+           currentUser.roles.includes("ROLE_HOD");
   };
 
   const value = {
@@ -70,3 +96,5 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+
+export default AuthContext;

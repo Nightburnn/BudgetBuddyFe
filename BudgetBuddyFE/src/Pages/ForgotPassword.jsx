@@ -20,6 +20,7 @@ const ForgotPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const otpRefs = useRef([]);
 
@@ -50,59 +51,110 @@ const ForgotPassword = () => {
     return () => clearInterval(interval);
   }, [step, timer]);
 
+  // For debugging purposes
+  useEffect(() => {
+    console.log("Current step:", step);
+  }, [step]);
+
   const handleSendEmail = async () => {
+    // First, change the step immediately
+    setStep(2);
+    setTimer(600);
+    setShowResend(false);
+    setIsSubmitting(true);
+    
     try {
+      console.log("Sending email to:", email);
+      // The API call happens after we've already changed the step
       const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      console.log("Email response:", response.data);
+      
       if (response.data.success) {
         toast.success('OTP sent to your email!');
-        setStep(2);
-        setTimer(600); 
-        setShowResend(false);
       }
     } catch (error) {
+      console.error("Send email error:", error.response?.data || error);
       toast.error(error.response?.data?.message || 'Failed to send OTP. Please try again.');
+      // We don't change the step back to 1 if there's an error
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // We'll verify the OTP along with the password reset
   const handleMoveToPasswordReset = () => {
     if (otp.some(digit => digit === '')) {
       toast.error('Please enter the complete OTP');
       return;
     }
-    setStep(3);
+    
+    console.log("Moving to password reset step");
+    
+    // Force a re-render and state update
+    setTimeout(() => {
+      setStep(3);
+      console.log("Advanced to step 3");
+    }, 100);
   };
-
   const handleResetPassword = async () => {
     if (password !== confirmPassword) {
       toast.error('Passwords do not match!');
       return;
     }
-
-    // Check if OTP has expired
-    if (timer === 0) {
-      toast.error('OTP has expired. Please request a new one.');
-      setStep(2);
+  
+    if (!validatePassword(password)) {
+      toast.error('Password must be at least 8 characters, start with a capital letter, and contain a special character.');
       return;
     }
-
+  
     setIsVerifying(true);
+    
     try {
-      const response = await axios.post(`${API_URL}/auth/reset-password`, {
+      console.log("Submitting reset password request");
+      const resetData = {
         email,
-        password,
-        otp: otp.join('')
-      });
-
-      if (response.data.success) {
+        otp: otp.join(''),
+        newPassword: password
+      };
+      console.log("Reset data:", resetData);
+      
+      const response = await axios.post(`${API_URL}/auth/reset-password`, resetData);
+      
+      // Log the complete response
+      console.log("Complete reset response:", JSON.stringify(response.data, null, 2));
+      
+      // Check if the backend considers it successful
+      if (response.data && response.data.success === true) {
+        console.log("Password reset successful according to 'success' flag");
         toast.success('Password reset successfully!');
+        
+        setTimeout(() => {
+          console.log("Navigating to login page");
+          navigate('/login');
+        }, 3000);
+      } else if (response.data && response.status === 200) {
+        // Sometimes backends return 200 OK but don't include a success flag
+        console.log("Got 200 OK but no explicit success flag");
+        toast.success('Password reset request processed successfully!');
+        
         setTimeout(() => {
           navigate('/login');
-        }, 2000);
+        }, 3000);
+      } else {
+        // If we reach here, the server responded but indicated failure
+        console.log("Server indicated failure:", response.data);
+        toast.error(response.data.message || 'Something went wrong with password reset');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to reset password. Please try again.');
-      // If the error is related to OTP, go back to OTP screen
+      console.error("Reset password error:", error);
+      
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+        toast.error(error.response.data.message || 'Failed to reset password. Please try again.');
+      } else {
+        toast.error('Network error. Please check your connection and try again.');
+      }
+      
       if (error.response?.data?.message?.toLowerCase().includes('otp')) {
         setStep(2);
         setOtpError(true);
@@ -114,8 +166,13 @@ const ForgotPassword = () => {
 
   const handleResend = async () => {
     try {
+      setIsSubmitting(true);
+      console.log("Resending OTP to:", email);
+      
       // Reuse the forgot-password endpoint to resend the OTP
       const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
+      console.log("Resend response:", response.data);
+      
       if (response.data.success) {
         toast.success('New OTP sent successfully!');
         setOtp(['', '', '', '', '', '']);
@@ -124,7 +181,10 @@ const ForgotPassword = () => {
         setOtpError(false);
       }
     } catch (error) {
+      console.error("Resend OTP error:", error.response?.data || error);
       toast.error(error.response?.data?.message || 'Failed to resend OTP. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -183,11 +243,11 @@ const ForgotPassword = () => {
               />
             </div>
             <button
-              className={`btn btn-primary btn-block mt-4 ${validateEmail(email) ? 'active' : ''}`}
+              className={`btn btn-primary btn-block mt-4 ${validateEmail(email) && !isSubmitting ? 'active' : ''}`}
               onClick={handleSendEmail}
-              disabled={!validateEmail(email)}
+              disabled={!validateEmail(email) || isSubmitting}
             >
-              Next
+              {isSubmitting ? 'Sending...' : 'Next'}
             </button>
           </div>
         )}
@@ -224,7 +284,7 @@ const ForgotPassword = () => {
             <button
               className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') && timer > 0 ? 'active' : ''}`}
               onClick={handleMoveToPasswordReset}
-              disabled={!otp.every(digit => digit !== '') || timer === 0}
+              disabled={!otp.every(digit => digit !== '') || timer === 0 || isSubmitting}
             >
               Next
             </button>
@@ -267,11 +327,11 @@ const ForgotPassword = () => {
               containing a special character (e.g., @, #, $, !).
             </p>
             <button
-              className={`btn btn-primary btn-block mt-4 ${validatePassword(password) && password === confirmPassword ? 'active' : ''}`}
+              className={`btn btn-primary btn-block mt-4 ${validatePassword(password) && password === confirmPassword && !isVerifying ? 'active' : ''}`}
               onClick={handleResetPassword}
-              disabled={!validatePassword(password) || password !== confirmPassword}
+              disabled={!validatePassword(password) || password !== confirmPassword || isVerifying}
             >
-              Reset Password
+              {isVerifying ? 'Resetting...' : 'Reset Password'}
             </button>
           </div>
         )}

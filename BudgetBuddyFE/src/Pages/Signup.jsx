@@ -127,71 +127,75 @@ const Signup = () => {
     }
   };
 
-  const handleVerifyOTP = async () => {
-    try {
-      setIsVerifying(true);
-      const otpString = otp.join('');
-      
-      const requestData = {
-        email,
-        otp: otpString
-      };
-      
-      // Log what we're sending
-      console.log("Verifying OTP with data:", requestData);
-      console.log("OTP type:", typeof otpString);
-      console.log("Email type:", typeof email);
-      
-      // Use the verification endpoint
-      const response = await axios.post(`${API_URL}/auth/verify-otp`, requestData);
-      
-      console.log("Verification response:", response.data);
-  
-      if (response.data.success) {
-        toast.success("Registration successful!");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      }
-    } catch (error) {
-      console.error("OTP verification error:", error);
-      console.log("Error status:", error.response?.status);
-      console.log("Error data:", error.response?.data);
-      
-      const errorMessage =
-        error.response?.data?.message || "Invalid OTP. Please try again.";
-      toast.error(errorMessage);
-      setOtpError(true);
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-  
+ // Verify OTP
+const handleVerifyOTP = async () => {
+  try {
+    setIsVerifying(true);
+    const otpString = otp.join('');
+    
+    const requestData = {
+      email,
+      otp: otpString
+    };
+    
+    // Log what we're sending
+    console.log("Verifying OTP with data:", requestData);
+    
+    // Use the verification endpoint
+    const response = await axios.post(`${API_URL}/auth/verify-otp`, requestData);
+    
+    console.log("Verification response:", response.data);
+    
+    // Execute success actions directly without checking response.data.success
+    toast.success("Registration successful!");
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 3000);
+    
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    console.log("Error status:", error.response?.status);
+    console.log("Error data:", error.response?.data);
+    
+    const errorMessage =
+      error.response?.data?.message || "Invalid OTP. Please try again.";
+    toast.error(errorMessage);
+    setOtpError(true);
+  } finally {
+    setIsVerifying(false);
+  }
+};
 
 // Resend OTP
 const handleResendOTP = async () => {
   try {
-    // Since the same endpoint only accepts email and OTP, for resend we'll 
-    // just send the email with an empty OTP string
-    const response = await axios.post(`${API_URL}/auth/password/verify-otp`, {
+    const requestData = {
       email,
-      otp: "" // Empty OTP to indicate this is a resend request
-    });
-
-    if (response.data.success) {
-      toast.success("New OTP sent successfully!");
-      setOtp(['', '', '', '', '', '']);
-      setTimer(480);
-      setShowResend(false);
-      setOtpError(false);
-    }
+    };
+    
+    console.log("Resending OTP with data:", requestData);
+    
+    const response = await axios.post(`${API_URL}/auth/resend-otp`, requestData);
+    
+    console.log("Resend response:", response.data);
+    
+    // Execute success actions directly without checking response.data.success
+    toast.success("New OTP sent successfully!");
+    setOtp(['', '', '', '', '', '']);
+    setTimer(480);
+    setShowResend(false);
+    setOtpError(false);
+    
   } catch (error) {
+    console.error("Resend OTP error:", error);
+    console.log("Error status:", error.response?.status);
+    console.log("Error data:", error.response?.data);
+    
     const errorMessage =
       error.response?.data?.message || "Failed to resend OTP. Please try again.";
     toast.error(errorMessage);
   }
 };
-  // Initial signup process - registers user and triggers OTP generation
   const handleSignup = async () => {
     try {
       setIsLoading(true);
