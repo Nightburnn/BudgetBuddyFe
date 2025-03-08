@@ -13,29 +13,26 @@ const ExpenseChart = () => {
   useEffect(() => {
     const fetchExpenseData = async () => {
       try {
-        // Single API endpoint with query parameter for data type
         const response = await axios.get(`${API_URL}/admin/dashboard/get-expense-chart`, {
           params: { type: 'all' }
         });
 
-        // Set monthly data
         setMonthlyData(
           response.data.monthly && response.data.monthly.length > 0
             ? response.data.monthly.map(item => ({
                 name: item.month,
-                amount: item.amount // Corrected property name
+                amount: item.amount 
               }))
-            : [] // Empty array if no data
+            : [] 
         );
 
-        // Set yearly data
         setYearlyData(
           response.data.yearly && response.data.yearly.length > 0
             ? response.data.yearly.map(item => ({
-                name: item.year.toString(), // Ensure year is a string
-                amount: item.amount // Corrected property name
+                name: item.year.toString(), 
+                amount: item.amount
               }))
-            : [] // Empty array if no data
+            : [] 
         );
 
         setLoading(false);
@@ -56,7 +53,6 @@ const ExpenseChart = () => {
   console.log("this is the expense chart data:", data);
   
   // Create empty data for when there's no data
-  // This ensures the chart is still displayed but empty
   const emptyData = viewType === 'Monthly' 
     ? [{ name: 'Jan', amount: 0 }, { name: 'Feb', amount: 0 }, { name: 'Mar', amount: 0 }]
     : [{ name: '2022', amount: 0 }, { name: '2023', amount: 0 }, { name: '2024', amount: 0 }];

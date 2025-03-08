@@ -35,7 +35,7 @@ const DepartmentList = () => {
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching departments:', error);
-        setDepartmentData([]); // Set to empty array on error
+        setDepartmentData([]); 
         setIsLoading(false);
       }
     };
@@ -65,31 +65,27 @@ const DepartmentList = () => {
   
       console.log("Department deleted successfully");
   
-      // Show success toast notification
       toast.success("Department deleted successfully!", {
         position: "top-right",
-        autoClose: 3000, // Close after 3 seconds
+        autoClose: 3000, 
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
       });
   
-      // Update the UI by removing the deleted department
       setDepartmentData(prevData =>
         prevData.filter(dept => (dept.id || dept._id) !== departmentId)
       );
   
-      // Close the modal
       setShowDeleteModal(false);
   
     } catch (error) {
       console.error("Error deleting department:", error);
   
-      // Show error toast notification
       toast.error("Failed to delete department. Please try again.", {
         position: "top-right",
-        autoClose: 3000, // Close after 3 seconds
+        autoClose: 3000, 
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -98,12 +94,10 @@ const DepartmentList = () => {
     }
   };
 
-  // Safety check for filtering - only filter if departmentData is an array
   const filteredData = Array.isArray(departmentData)
     ? departmentData.filter((item) => {
       if (!searchTerm) return true;
-      if (!item) return false; // Skip null/undefined items
-
+      if (!item) return false; 
       const searchValue = searchTerm.toLowerCase();
       return (
         (item.DepartmentName && item.DepartmentName.toLowerCase().includes(searchValue)) ||
@@ -113,7 +107,6 @@ const DepartmentList = () => {
     })
     : [];
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -128,12 +121,10 @@ const DepartmentList = () => {
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   const renderPageNumbers = () => {
-    // Your existing renderPageNumbers function - no changes needed
     const pages = [];
     const maxVisiblePages = 3;
     const ellipsis = <span className="ellipsis">...</span>;
 
-    // Always show the first page
     pages.push(
       <button
         key={1}
@@ -144,12 +135,10 @@ const DepartmentList = () => {
       </button>
     );
 
-    // Show ellipsis if current page is far from the start
     if (currentPage > maxVisiblePages + 1) {
       pages.push(ellipsis);
     }
 
-    // Calculate the range of pages to show around the current page
     const startPage = Math.max(2, currentPage - maxVisiblePages);
     const endPage = Math.min(totalPages - 1, currentPage + maxVisiblePages);
 
@@ -165,12 +154,10 @@ const DepartmentList = () => {
       );
     }
 
-    // Show ellipsis if current page is far from the end
     if (currentPage < totalPages - maxVisiblePages) {
       pages.push(ellipsis);
     }
 
-    // Always show the last page
     if (totalPages > 1) {
       pages.push(
         <button

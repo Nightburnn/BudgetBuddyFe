@@ -20,7 +20,6 @@ const MetricCard = ({ title, value, colorClass, isLoading }) => (
 );
 
 const BudgetCard = () => {
-  // Combined state for all metrics
   const [metrics, setMetrics] = useState({
     totalBudgets: null,
     totalRecurring: null,

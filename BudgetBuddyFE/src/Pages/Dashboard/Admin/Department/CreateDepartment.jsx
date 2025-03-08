@@ -21,7 +21,6 @@ const CreateDepartment = () => {
     setIsLoading(true);
 
     try {
-      // Prepare data with departments set automatically
       const requestData = {
         departments: [departmentName]
       };
