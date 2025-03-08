@@ -21,6 +21,14 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState([]);
 
+  // OTP verification state
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [timer, setTimer] = useState(480);
+  const [showResend, setShowResend] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [otpError, setOtpError] = useState(false);
+  const otpRefs = useRef([]);
+
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -30,6 +38,24 @@ const Signup = () => {
     const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
     return passwordRegex.test(password);
   };
+
+  // OTP Timer effect
+  useEffect(() => {
+    let interval;
+    if (step === 4 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            setShowResend(true);
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
   useEffect(() => {
     const fetchDepartments = async () => {
@@ -99,6 +125,84 @@ const Signup = () => {
 
   const handleRoleSelect = (role) => setSelectedRole(role);
 
+  // Handle OTP input change
+  const handleOtpChange = (index, value) => {
+    if (value.length <= 1 && /^\d*$/.test(value)) {
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
+      setOtpError(false);
+
+      if (value && index < 5) {
+        otpRefs.current[index + 1].focus();
+      }
+    }
+  };
+
+  // Verify OTP
+  const handleVerifyOTP = async () => {
+    try {
+      setIsVerifying(true);
+      const otpString = otp.join('');
+
+      const requestData = {
+        email,
+        otp: otpString
+      };
+
+      console.log("Verifying OTP with data:", requestData);
+      const response = await axios.post(`${API_URL}/auth/verify-otp`, requestData);
+
+      console.log("Verification response:", response.data);
+
+      toast.success("Registration successful! Redirecting to login...");
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 3000);
+
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      console.log("Error status:", error.response?.status);
+      console.log("Error data:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.message || "Invalid OTP. Please try again.";
+      toast.error(errorMessage);
+      setOtpError(true);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // Resend OTP
+  const handleResendOTP = async () => {
+    try {
+      const requestData = {
+        email,
+      };
+
+      console.log("Resending OTP with data:", requestData);
+      const response = await axios.post(`${API_URL}/auth/resend-otp`, requestData);
+
+      console.log("Resend response:", response.data);
+
+      toast.success("New OTP sent successfully!");
+      setOtp(['', '', '', '', '', '']);
+      setTimer(480);
+      setShowResend(false);
+      setOtpError(false);
+
+    } catch (error) {
+      console.error("Resend OTP error:", error);
+      console.log("Error status:", error.response?.status);
+      console.log("Error data:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.message || "Failed to resend OTP. Please try again.";
+      toast.error(errorMessage);
+    }
+  };
+
   const handleSignup = async () => {
     try {
       setIsLoading(true);
@@ -122,11 +226,11 @@ const Signup = () => {
       const response = await axios.post(endpoint, userData);
       console.log("Signup response:", response.data);
 
-      // Redirect to login after successful signup
-      toast.success("Registration successful! Redirecting to login...");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
+      // Move to OTP verification step after successful signup
+      setStep(4);
+      setTimer(480);
+      setShowResend(false);
+      toast.success("Registration initiated! Please verify your email with OTP.");
 
     } catch (error) {
       console.error("Error during signup:", error);
@@ -136,8 +240,14 @@ const Signup = () => {
         error.response?.data?.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
+  };
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
   return (
@@ -375,6 +485,47 @@ const Signup = () => {
               onClick={handleNext}
             >
               {isLoading ? <span>Signing Up...</span> : "Sign Up"}
+            </button>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="form-step forgotpass">
+            <p className="text-center right mb-4 main-highlight">
+              Enter the 6-digit OTP sent to <span className="highlight-email">{email}</span>
+            </p>
+            <div className="d-flex justify-content-between mb-1">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (otpRefs.current[index] = el)}
+                  type="text"
+                  className={`form-control otp-input ${otpError ? 'invalid' : ''}`}
+                  value={digit}
+                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  placeholder="-"
+                  maxLength={1}
+                />
+              ))}
+            </div>
+            {otpError && (
+              <p className="text-danger mb-3">Incorrect code</p>
+            )}
+            <p className="text-center mb-3 mt-2">
+              {showResend ? (
+                <span className="main-highlight">OTP expired. <span className="text-primary cursor-pointer" onClick={handleResendOTP}>Resend</span></span>
+              ) : (
+                <span className="main-highlight">
+                  OTP valid for: <span className="highlight-timer">{formatTime(timer)}</span>
+                </span>
+              )}
+            </p>
+            <button
+              className={`btn btn-primary btn-block ${otp.every(digit => digit !== '') ? 'active' : ''}`}
+              onClick={handleVerifyOTP}
+              disabled={!otp.every(digit => digit !== '') || isVerifying}
+            >
+              {isVerifying ? <span>Verifying...</span> : "Verify"}
             </button>
           </div>
         )}
