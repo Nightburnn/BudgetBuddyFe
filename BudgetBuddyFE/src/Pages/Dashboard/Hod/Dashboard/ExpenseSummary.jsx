@@ -11,7 +11,7 @@ const ExpenseSummary = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeIndex, setActiveIndex] = useState(null);
-  const { currentUser } = useAuth(); 
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchExpenseData = async () => {
@@ -24,14 +24,14 @@ const ExpenseSummary = () => {
 
       try {
         const response = await axios.get(`${API_URL}/departments/${currentUser.department_id}/dashboard/expense-summary`);
+        console.log("API Response:", response.data); // Log the API response
         setMonthlyData(response.data);
-        console.log("This is the monthly expense summary: ", response.data)
-        
+
         const availableMonths = Object.keys(response.data);
         if (availableMonths.length > 0) {
           setSelectedMonth(availableMonths[0]);
         }
-        
+
         setLoading(false);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch expenses');
@@ -55,15 +55,16 @@ const ExpenseSummary = () => {
   }
 
   const COLORS = ['#F1BFBF', '#D3C3F9', '#CFF1FB', '#FFECB2'];
-  
-  const currentMonthData = monthlyData[selectedMonth] || {};
-  
-  const chartData = Object.entries(currentMonthData).map(([name, value]) => ({
-    name: name, 
-    value: value
-  })).sort((a, b) => b.value - a.value);
 
-  const total = Object.values(currentMonthData).reduce((acc, curr) => acc + curr, 0);
+  const currentMonthData = monthlyData[selectedMonth] || [];
+
+  const chartData = currentMonthData.map(item => {
+    const key = Object.keys(item)[0];
+    const value = item[key];
+    return { name: key, value: value };
+  }).sort((a, b) => b.value - a.value);
+
+  const total = chartData.reduce((acc, curr) => acc + curr.value, 0);
 
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
@@ -88,7 +89,7 @@ const ExpenseSummary = () => {
     <div className="expense-wrapper expense-card">
       <div className="d-flex justify-content-between align-items-center">
         <h2 className="m-0">Expense Summary</h2>
-        <select 
+        <select
           className="expense-select"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
@@ -144,7 +145,7 @@ const ExpenseSummary = () => {
               {chartData.map((item, index) => (
                 <div key={item.name} className="expense-item">
                   <div className="expense-label">
-                    <span 
+                    <span
                       className="expense-dot"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></span>
