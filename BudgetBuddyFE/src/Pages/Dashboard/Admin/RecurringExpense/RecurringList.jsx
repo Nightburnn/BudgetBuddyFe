@@ -291,7 +291,7 @@ const rejectExpense = async (expenseId) => {
                 <th>Time Interval</th>
                 <th>Assigned To</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th> </th>
               </tr>
             </thead>
             <tbody>

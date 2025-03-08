@@ -45,7 +45,7 @@ const BudgetList = () => {
             const formattedData = [{
               BudgetName: data.name || "Unnamed Budget",
               Amount: data.amount || 0,
-              Expenses: Array.isArray(data.expenses) ? data.expenses.join(", ") : "None",
+              Expenses: Array.isArray(data.oneTimeExpenses) ? data.oneTimeExpenses.join(", ") : "None",
               RecurringExpenses: Array.isArray(data.recurringExpenses) ? data.recurringExpenses.join(", ") : "None",
               Date: data.date || new Date().toISOString().split('T')[0],
               Status: data.approvalStatus || "Pending",
@@ -60,7 +60,7 @@ const BudgetList = () => {
             const formattedData = data.map(item => ({
               BudgetName: item.name || "Unnamed Budget",
               Amount: item.amount || 0,
-              Expenses: Array.isArray(item.expenses) ? item.expenses.join(", ") : "None",
+              Expenses: Array.isArray(item.oneTimeExpenses) ? item.oneTimeExpenses.join(", ") : "None",
               RecurringExpenses: Array.isArray(item.recurringExpenses) ? item.recurringExpenses.join(", ") : "None",
               Date: item.date || new Date().toISOString().split('T')[0],
               Status: item.approvalStatus || "Pending",

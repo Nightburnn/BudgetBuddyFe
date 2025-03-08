@@ -41,13 +41,11 @@ const CreateBudget = () => {
   };
 
   const handleSend = async () => {
-    // Validate department ID
     if (!departmentId) {
       toast.error('Department ID is not available. Please login again.');
       return;
     }
   
-    // Ensure files are selected
     if (files.length === 0) {
       toast.error('Please select at least one CSV file.');
       return;
@@ -56,18 +54,15 @@ const CreateBudget = () => {
     setIsLoading(true);
   
     try {
-      // Create FormData for file upload
       const formData = new FormData();
       files.forEach(file => {
-        formData.append('files', file); // Append each file to the FormData
+        formData.append('files', file); 
       });
   
-      // Log details for debugging
       console.log('Uploading budget files:', files);
       console.log('Department ID:', departmentId);
       console.log('Endpoint:', `${API_URL}/departments/${departmentId}/budgets/upload`);
   
-      // Make API call to upload budget files
       const response = await axios.post(
         `${API_URL}/departments/${departmentId}/budgets/upload`,
         formData,
@@ -78,23 +73,19 @@ const CreateBudget = () => {
         }
       );
   
-      // Success toast
       toast.success('Budget upload successful!', {
         position: "top-right",
         autoClose: 3000,
       });
   
-      // Log full response
       console.log('Budget Upload Response:', response);
   
-      // Reset state after successful upload
       setTimeout(() => {
         setShowModal(false);
         setFiles([]);
       }, 2000);
   
     } catch (error) {
-      // Log and show error details
       console.error('Budget Upload Error:', error);
       const errorMessage = error.response?.data?.message || 'Failed to upload budget';
       toast.error(errorMessage);

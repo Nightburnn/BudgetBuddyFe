@@ -69,7 +69,7 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
         <div className="notification-info">
           <h6 className="mb-1">{notification.type}</h6>
           <p className="mb-1">{notification.message}</p>
-          <small className="text-muted">{notification.departmentName || 'No Department'}</small>
+          <small className="text-muted">{notification.from|| 'No Department'}</small>
         </div>
         <div className="notification-actions d-flex flex-column align-items-end">
           <small className="text-muted mt-2">{notification.time}<br/> {notification.date}</small>

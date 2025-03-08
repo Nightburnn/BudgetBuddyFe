@@ -26,7 +26,6 @@ const ExpenseSummary = () => {
         const response = await axios.get(`${API_URL}/departments/${currentUser.department_id}/dashboard/expense-summary`);
         setMonthlyData(response.data);
         
-        // Set the first available month as selected if any exist
         const availableMonths = Object.keys(response.data);
         if (availableMonths.length > 0) {
           setSelectedMonth(availableMonths[0]);
@@ -45,7 +44,6 @@ const ExpenseSummary = () => {
   if (loading) return <div>Loading expenses...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Make sure we have at least one month available
   if (Object.keys(monthlyData).length === 0) {
     return (
       <div className="expense-wrapper expense-card">
@@ -59,9 +57,8 @@ const ExpenseSummary = () => {
   
   const currentMonthData = monthlyData[selectedMonth] || {};
   
-  // Convert the dynamic category data to array format suitable for chart
   const chartData = Object.entries(currentMonthData).map(([name, value]) => ({
-    name: name, // Keep the original category name
+    name: name, 
     value: value
   })).sort((a, b) => b.value - a.value);
 

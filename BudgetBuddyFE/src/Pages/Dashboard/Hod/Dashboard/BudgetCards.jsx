@@ -29,7 +29,6 @@ const BudgetCards = () => {
         const recurringResponse = await axios.get(`${API_URL}/departments/${currentUser.department_id}/dashboard/total-recurring-expense-count`);
         console.log("Recurring expense response data:", recurringResponse.data);
         
-        // Handle both object format {count: X} and direct number format
         const budgetCount = typeof budgetResponse.data === 'object' && budgetResponse.data !== null 
           ? budgetResponse.data.count 
           : budgetResponse.data;

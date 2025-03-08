@@ -36,15 +36,12 @@ const BudgetList = () => {
         const data = await response.json();
         console.log("Budget data fetched successfully:", data);
 
-        // Check if data exists and create a proper array for the component
         if (data) {
-          // If data is a single object (not in an array)
           if (!Array.isArray(data)) {
-            // Create an array with this single budget item
             const formattedData = [{
               BudgetName: data.name || "Unnamed Budget",
               Amount: data.amount || 0,
-              Expenses: Array.isArray(data.expenses) ? data.expenses.join(", ") : "None",
+              Expenses: Array.isArray(data.oneTimeExpenses) ? data.oneTimeExpenses.join(", ") : "None",
               RecurringExpenses: Array.isArray(data.recurringExpenses) ? data.recurringExpenses.join(", ") : "None",
               Date: data.date || new Date().toISOString().split('T')[0],
               Status: data.approvalStatus || "Pending",
@@ -53,11 +50,10 @@ const BudgetList = () => {
             console.log("Formatted single budget data:", formattedData);
             setBudgetData(formattedData);
           } else {
-            // If it's already an array, transform each item
             const formattedData = data.map(item => ({
               BudgetName: item.name || "Unnamed Budget",
               Amount: item.amount || 0,
-              Expenses: Array.isArray(item.expenses) ? item.expenses.join(", ") : "None",
+              Expenses: Array.isArray(item.oneTimeExpenses) ? item.oneTimeExpenses.join(", ") : "None",
               RecurringExpenses: Array.isArray(item.recurringExpenses) ? item.recurringExpenses.join(", ") : "None",
               Date: item.date || new Date().toISOString().split('T')[0],
               Status: item.approvalStatus || "Pending",
@@ -73,7 +69,7 @@ const BudgetList = () => {
       } catch (error) {
         console.error("Error fetching budget data:", error);
         setError(error.message);
-        setBudgetData([]); // Use empty array on error
+        setBudgetData([]); 
       } finally {
         setLoading(false);
       }
@@ -120,7 +116,6 @@ const BudgetList = () => {
     const maxVisiblePages = 3;
     const ellipsis = <span key="ellipsis" className="ellipsis">...</span>;
 
-    // Always show the first page
     pages.push(
       <button
         key={1}
@@ -131,12 +126,10 @@ const BudgetList = () => {
       </button>
     );
 
-    // Show ellipsis if current page is far from the start
     if (currentPage > maxVisiblePages + 1) {
       pages.push(ellipsis);
     }
 
-    // Calculate the range of pages to show around the current page
     const startPage = Math.max(2, currentPage - maxVisiblePages);
     const endPage = Math.min(totalPages - 1, currentPage + maxVisiblePages);
 
@@ -156,7 +149,6 @@ const BudgetList = () => {
       pages.push(ellipsis);
     }
 
-    // Always show the last page
     if (totalPages > 1) {
       pages.push(
         <button
@@ -172,7 +164,6 @@ const BudgetList = () => {
     return pages;
   };
 
-  // Helper function to display N/A for missing data
   const displayValue = (value) => {
     return value !== undefined && value !== null && value !== "" ? value : "N/A";
   };

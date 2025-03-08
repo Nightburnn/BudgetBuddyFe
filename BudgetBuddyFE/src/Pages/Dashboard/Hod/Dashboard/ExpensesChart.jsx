@@ -22,10 +22,8 @@ const ExpenseChart = () => {
       }
 
       try {
-        // Single API call to get both monthly and yearly data
         const response = await axios.get(`${API_URL}/departments/${currentUser.department_id}/dashboard/expense-chart`);
         
-        // Directly use the API response format which already has 'month'/'year' and 'amount'
         setExpenseData({
           monthly: response.data.monthly,
           yearly: response.data.yearly
@@ -46,7 +44,6 @@ const ExpenseChart = () => {
 
   const data = viewType === 'Monthly' ? expenseData.monthly : expenseData.yearly;
 
-  // If no data, return null to hide the entire component
   if (!data || data.length === 0) return null;
 
   return (
