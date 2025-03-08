@@ -84,7 +84,6 @@ const RoleBasedRoute = ({ adminComponent, hodComponent }) => {
   } else if (isHOD()) {
     return hodComponent;
   } else {
-    // Fallback - should not reach here due to ProtectedRoute
     return <Navigate to="/login" />;
   }
 };

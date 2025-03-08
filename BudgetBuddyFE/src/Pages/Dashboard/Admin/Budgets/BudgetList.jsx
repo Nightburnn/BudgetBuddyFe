@@ -22,7 +22,7 @@ const BudgetList = () => {
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
-  // Fetch budget data
+  
   useEffect(() => {
     const fetchBudgets = async () => {
       setIsLoading(true);
@@ -41,9 +41,7 @@ const BudgetList = () => {
         console.log("Budget data fetched successfully:", data);
 
         if (data) {
-          // If data is a single object (not in an array)
           if (!Array.isArray(data)) {
-            // Create an array with this single budget item
             const formattedData = [{
               BudgetName: data.name || "Unnamed Budget",
               Amount: data.amount || 0,
@@ -59,7 +57,6 @@ const BudgetList = () => {
             console.log("Formatted single budget data:", formattedData);
             setBudgetData(formattedData);
           } else {
-            // If it's already an array, transform each item
             const formattedData = data.map(item => ({
               BudgetName: item.name || "Unnamed Budget",
               Amount: item.amount || 0,
@@ -80,7 +77,7 @@ const BudgetList = () => {
       } catch (error) {
         console.error("Error fetching budget data:", error);
         setError(error.message);
-        setBudgetData([]); // Use empty array on error
+        setBudgetData([]); 
       } finally {
         setLoading(false);
         setIsLoading(false);
@@ -90,7 +87,6 @@ const BudgetList = () => {
     fetchBudgets();
   }, []);
 
-  // Filtering logic
   const filteredData = budgetData.filter((item) => {
     const matchesTab =
       activeTab === "All Budgets" ||
@@ -110,13 +106,11 @@ const BudgetList = () => {
     return matchesTab && matchesSearch;
   });
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Action handlers
   const handleBudgetClick = (budget) => {
     console.log("View budget clicked:", budget);
     setSelectedBudget(budget);
@@ -145,7 +139,6 @@ const BudgetList = () => {
   
       console.log("Approve response:", response.data);
   
-      // Update local state
       setBudgetData((prevData) =>
         prevData.map((budget) =>
           budget.id === selectedBudget.id
@@ -154,10 +147,8 @@ const BudgetList = () => {
         )
       );
   
-      // Close the modal
       setShowApproveModal(false);
   
-      // Show success toast notification
       toast.success("Budget approved successfully!");
     } catch (err) {
       console.error("Error approving budget:", err);
@@ -181,7 +172,6 @@ const BudgetList = () => {
   setIsLoading(true);
 
   try {
-    // Use axios for the API request
     const response = await axios.post(
       `${API_URL}/budgets/${selectedBudget.id}/reject`,
       { reason: rejectReason }
@@ -189,7 +179,6 @@ const BudgetList = () => {
 
     console.log("Reject response:", response.data);
 
-    // Update local state
     setBudgetData((prevData) =>
       prevData.map((budget) =>
         budget.id === selectedBudget.id
@@ -198,16 +187,13 @@ const BudgetList = () => {
       )
     );
 
-    // Close the modal and reset the reason
     setShowRejectModal(false);
     setRejectReason("");
 
-    // Show success toast
     toast.success("Budget rejected successfully!");
   } catch (err) {
     console.error("Error rejecting budget:", err);
 
-    // Show error toast with detailed message
     toast.error(
       err.response?.data?.message || "Failed to reject budget. Please try again."
     );
@@ -340,7 +326,6 @@ const BudgetList = () => {
     return pages;
   };
 
-  // Display error state
   if (error && budgetData.length === 0) {
     console.log("Displaying error state:", error);
     return <div className="container my-5 text-danger">Error: {error}</div>;
@@ -348,7 +333,7 @@ const BudgetList = () => {
 
   return (
     <div className="container my-5 budgetlist budgetlistadvanced">
-      <ToastContainer /> {/* Add this line */}
+      <ToastContainer /> 
       <div className="budget-list-row row mb-3">
         <div className="col d-flex justify-content-between align-items-center mobile-layout">
           <div className="d-flex align-items-center gap-4">
