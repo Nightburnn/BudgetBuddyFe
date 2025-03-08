@@ -25,6 +25,7 @@ const ExpenseSummary = () => {
       try {
         const response = await axios.get(`${API_URL}/departments/${currentUser.department_id}/dashboard/expense-summary`);
         setMonthlyData(response.data);
+        console.log("This is the monthly expense summary: ", response.data)
         
         const availableMonths = Object.keys(response.data);
         if (availableMonths.length > 0) {
