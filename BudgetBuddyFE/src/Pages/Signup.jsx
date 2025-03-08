@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useNavigate } from 'react-router-dom';
+import { useNavigat, Link } from 'react-router-dom';
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -534,7 +534,7 @@ const Signup = () => {
         )}
 
         <p className="auth-footer mt-3">
-          Have an account? <a href="/login">Sign In</a>
+          Have an account? <Link to="/login">Sign In</Link>
         </p>
       </div>
     </div>
