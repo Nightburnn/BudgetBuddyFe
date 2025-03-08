@@ -285,9 +285,27 @@ letter-spacing: -0.24px;
   text-align: center;
   font-size: 1.2rem;
   margin: 0 5px;
+  align-items: center;
+}
+
+.otp-container {
+  gap: 10px;
 }
 
 
+@media (max-width: 767.98px) {
+  .otp-container {
+    gap: 5px; 
+    justify-content: center !important; 
+  }
+
+  .otp-input {
+    width: 40px !important; 
+    height: 40px;
+    font-size: 1rem; 
+    margin: 0 2px; 
+  }
+}
 .modal-overlay {
   position: fixed;
   top: 0;

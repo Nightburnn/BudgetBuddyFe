@@ -494,7 +494,7 @@ const Signup = () => {
             <p className="text-center right mb-4 main-highlight">
               Enter the 6-digit OTP sent to <span className="highlight-email">{email}</span>
             </p>
-            <div className="d-flex justify-content-between mb-1">
+            <div className="d-flex justify-content-between  mb-1 otp-container">
               {otp.map((digit, index) => (
                 <input
                   key={index}
