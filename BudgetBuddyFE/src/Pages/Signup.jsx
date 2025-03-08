@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useNavigat, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
