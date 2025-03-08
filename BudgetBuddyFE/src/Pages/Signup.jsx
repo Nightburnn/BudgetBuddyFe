@@ -8,7 +8,6 @@ import bb from "../assests/images/bb.png";
 import { API_URL } from '../config/api';
 
 const Signup = () => {
-  // Initial form state
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState(null);
   const [firstName, setFirstName] = useState("");
@@ -105,7 +104,6 @@ const Signup = () => {
       setIsLoading(true);
       console.log("Starting signup process...");
 
-      // Use one of two signup endpoints based on role
       const endpoint = selectedRole === "admin"
         ? `${API_URL}/auth/signup/admin`
         : `${API_URL}/auth/signup/hod`;
@@ -138,7 +136,7 @@ const Signup = () => {
         error.response?.data?.message || "Registration failed. Please try again.";
       toast.error(errorMessage);
     } finally {
-      setIsLoading(false); // Always reset loading state
+      setIsLoading(false); 
     }
   };
 

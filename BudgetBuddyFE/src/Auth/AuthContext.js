@@ -1,16 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Create Authentication Context
 const AuthContext = createContext(null);
 
-// Create Authentication Provider
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check for logged in user when component mounts
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
@@ -26,7 +23,6 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  // Login function that preserves the original login response
   const login = (userData) => {
     console.log("Original login response:", userData);
     
@@ -35,7 +31,6 @@ export const AuthProvider = ({ children }) => {
     
     console.log("User stored in localStorage:", JSON.parse(localStorage.getItem("user")));
     
-    // Redirect based on roles or isAdmin flag
     if (userData.isAdmin === true || 
         (userData.roles && userData.roles.includes("ROLE_ADMIN"))) {
       console.log("Redirecting to admin dashboard");
@@ -56,7 +51,7 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  // Check if user is admin - check both isAdmin flag and roles array
+  // Check if user is admin 
   const isAdmin = () => {
     console.log("Checking isAdmin. Current user:", currentUser);
     const result = currentUser?.isAdmin === true || 
@@ -90,7 +85,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use Auth Context
 export const useAuth = () => {
   return useContext(AuthContext);
 };

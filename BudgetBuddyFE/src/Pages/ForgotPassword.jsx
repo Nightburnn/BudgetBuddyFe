@@ -51,13 +51,11 @@ const ForgotPassword = () => {
     return () => clearInterval(interval);
   }, [step, timer]);
 
-  // For debugging purposes
   useEffect(() => {
     console.log("Current step:", step);
   }, [step]);
 
   const handleSendEmail = async () => {
-    // First, change the step immediately
     setStep(2);
     setTimer(600);
     setShowResend(false);
@@ -65,7 +63,6 @@ const ForgotPassword = () => {
     
     try {
       console.log("Sending email to:", email);
-      // The API call happens after we've already changed the step
       const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
       console.log("Email response:", response.data);
       
@@ -75,7 +72,6 @@ const ForgotPassword = () => {
     } catch (error) {
       console.error("Send email error:", error.response?.data || error);
       toast.error(error.response?.data?.message || 'Failed to send OTP. Please try again.');
-      // We don't change the step back to 1 if there's an error
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +85,6 @@ const ForgotPassword = () => {
     
     console.log("Moving to password reset step");
     
-    // Force a re-render and state update
     setTimeout(() => {
       setStep(3);
       console.log("Advanced to step 3");
@@ -119,10 +114,8 @@ const ForgotPassword = () => {
       
       const response = await axios.post(`${API_URL}/auth/reset-password`, resetData);
       
-      // Log the complete response
       console.log("Complete reset response:", JSON.stringify(response.data, null, 2));
       
-      // Check if the backend considers it successful
       if (response.data && response.data.success === true) {
         console.log("Password reset successful according to 'success' flag");
         toast.success('Password reset successfully!');
@@ -132,7 +125,6 @@ const ForgotPassword = () => {
           navigate('/login');
         }, 3000);
       } else if (response.data && response.status === 200) {
-        // Sometimes backends return 200 OK but don't include a success flag
         console.log("Got 200 OK but no explicit success flag");
         toast.success('Password reset request processed successfully!');
         
@@ -140,7 +132,6 @@ const ForgotPassword = () => {
           navigate('/login');
         }, 3000);
       } else {
-        // If we reach here, the server responded but indicated failure
         console.log("Server indicated failure:", response.data);
         toast.error(response.data.message || 'Something went wrong with password reset');
       }
@@ -169,7 +160,6 @@ const ForgotPassword = () => {
       setIsSubmitting(true);
       console.log("Resending OTP to:", email);
       
-      // Reuse the forgot-password endpoint to resend the OTP
       const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
       console.log("Resend response:", response.data);
       
