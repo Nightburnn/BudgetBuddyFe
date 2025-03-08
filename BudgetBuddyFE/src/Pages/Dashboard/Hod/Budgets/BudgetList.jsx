@@ -7,19 +7,18 @@ import { useAuth } from "../../../../Auth/AuthContext";
 import "./style/BudgetList.css";
 
 const BudgetList = () => {
-  const [budgetData, setBudgetData] = useState([]); // State for budget data
+  const [budgetData, setBudgetData] = useState([]); 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("All Budgets");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [loading, setLoading] = useState(true); 
+  const [error, setError] = useState(null); 
   const itemsPerPage = 10;
 
-  const { currentUser } = useAuth(); // Access currentUser from AuthContext
+  const { currentUser } = useAuth(); 
 
-  // Fetch budget data from the API based on departmentId
   useEffect(() => {
     const fetchBudgetData = async () => {
       if (!currentUser || !currentUser.department_id) {
@@ -40,10 +39,8 @@ const BudgetList = () => {
         const data = await response.json();
         console.log("Budget data fetched successfully:", data);
 
-        // Format the data
         if (data) {
           if (!Array.isArray(data)) {
-            // Single budget object
             const formattedData = [{
               BudgetName: data.name || "Unnamed Budget",
               Amount: data.amount || 0,
@@ -55,7 +52,6 @@ const BudgetList = () => {
             }];
             setBudgetData(formattedData);
           } else {
-            // Array of budgets
             const formattedData = data.map(item => ({
               BudgetName: item.name || "Unnamed Budget",
               Amount: item.amount || 0,
@@ -81,15 +77,13 @@ const BudgetList = () => {
     };
 
     fetchBudgetData();
-  }, [currentUser]); // Re-fetch when currentUser changes
+  }, [currentUser]); 
 
-  // Handle budget click to show modal
   const handleBudgetClick = (budget) => {
     setSelectedBudget(budget);
     setShowDetailModal(true);
   };
 
-  // Handle view/download budget file
   const handleViewBudget = async () => {
     if (!selectedBudget) return;
 
@@ -100,18 +94,16 @@ const BudgetList = () => {
         throw new Error(`Failed to fetch budget file: ${response.statusText}`);
       }
 
-      // Convert response to a blob and create a download link
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `budget_${selectedBudget.id}.csv`; // Set the filename
+      a.download = `budget_${selectedBudget.id}.csv`; 
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      // Close the modal after download
       setShowDetailModal(false);
     } catch (error) {
       console.error("Error downloading budget file:", error);
@@ -120,16 +112,13 @@ const BudgetList = () => {
   };
 
   const filteredData = budgetData.filter((item) => {
-    // Normalize the status for comparison
     const itemStatus = item.Status ? item.Status.toLowerCase() : "";
     const tabStatus = activeTab.toLowerCase();
   
-    // Match the active tab
     const matchesTab =
-      activeTab === "All Budgets" || // Show all budgets if "All Budgets" is selected
-      itemStatus === tabStatus; // Otherwise, match the status (case-insensitive)
+      activeTab === "All Budgets" ||
+      itemStatus === tabStatus; 
   
-    // Match the search term
     if (!searchTerm) return matchesTab;
   
     const searchValue = searchTerm.toLowerCase();
@@ -143,7 +132,6 @@ const BudgetList = () => {
   });
 
   
-  // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -160,7 +148,6 @@ const BudgetList = () => {
     const maxVisiblePages = 3;
     const ellipsis = <span className="ellipsis">...</span>;
 
-    // Always show the first page
     pages.push(
       <button
         key={1}
@@ -171,12 +158,10 @@ const BudgetList = () => {
       </button>
     );
 
-    // Show ellipsis if current page is far from the start
     if (currentPage > maxVisiblePages + 1) {
       pages.push(ellipsis);
     }
 
-    // Calculate the range of pages to show around the current page
     const startPage = Math.max(2, currentPage - maxVisiblePages);
     const endPage = Math.min(totalPages - 1, currentPage + maxVisiblePages);
 
@@ -192,12 +177,10 @@ const BudgetList = () => {
       );
     }
 
-    // Show ellipsis if current page is far from the end
     if (currentPage < totalPages - maxVisiblePages) {
       pages.push(ellipsis);
     }
 
-    // Always show the last page
     if (totalPages > 1) {
       pages.push(
         <button
@@ -213,7 +196,6 @@ const BudgetList = () => {
     return pages;
   };
 
-  // Helper function to display N/A for missing data
   const displayValue = (value) => {
     return value !== undefined && value !== null && value !== "" ? value : "N/A";
   };

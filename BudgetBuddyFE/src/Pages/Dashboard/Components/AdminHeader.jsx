@@ -8,7 +8,7 @@ import { toast, ToastContainer } from 'react-toastify';
 
 const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState({ older: [], recent: [] }); // Updated state structure
+  const [notifications, setNotifications] = useState({ older: [], recent: [] }); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
@@ -24,15 +24,13 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
            pathParts[pathParts.length - 1].slice(1);
   };
 
-  // Fetch notifications from the API
   const fetchNotifications = async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/admin/notifications`);
-      setNotifications(response.data); // Set the entire response data
+      setNotifications(response.data);
       console.log("this is the notification:", response.data);
   
-      // Check if there are any unread notifications in either "recent" or "older"
       const hasUnread = 
         response.data.recent.some(n => !n.read) || 
         response.data.older.some(n => !n.read);
@@ -49,12 +47,10 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
 
 
 
-  // Fetch notifications on component mount
   useEffect(() => {
     fetchNotifications();
   }, []);
 
-  // Handle click outside notifications panel
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -67,7 +63,6 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Render notification item
   const renderNotificationItem = (notification) => (
     <div key={notification.id} className="notification-item mb-3">
       <div className="d-flex justify-content-between">

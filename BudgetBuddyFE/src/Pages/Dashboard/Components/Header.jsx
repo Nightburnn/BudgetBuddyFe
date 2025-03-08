@@ -31,7 +31,6 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     return "Dashboard";
   };
 
-  // Fetch notifications from API
   const fetchNotifications = async () => {
     if (!currentUser || !currentUser.department_id) {
       console.error("No departmentId found in currentUser");
@@ -49,10 +48,8 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
       const data = await response.json();
       console.log("this is notification data", data);
 
-      // Access the recent and older arrays directly from the data object
       const { recent, older } = data;
 
-      // Check if there are unread notifications in the recent array
       const hasUnread = recent.some(notification => !notification.isRead);
 
       setNotifications({ recent, older });
@@ -66,12 +63,10 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     }
   };
 
-  // Fetch notifications on component mount
   useEffect(() => {
     fetchNotifications();
   }, []);
 
-  // Handle click outside notifications panel
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
@@ -83,7 +78,6 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle opening notifications panel
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
   };

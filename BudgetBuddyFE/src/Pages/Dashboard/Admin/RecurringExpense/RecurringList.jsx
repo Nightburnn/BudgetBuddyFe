@@ -21,7 +21,6 @@ const RecurringList = () => {
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
-  // Fetch recurring expenses list
   useEffect(() => {
     fetchRecurringExpenses();
   }, []);
@@ -58,20 +57,17 @@ const RecurringList = () => {
       const response = await axios.put(`${API_URL}/recurringexpenses/${expenseId}/approve`);
       console.log("Approval response:", response.data);
   
-      // Update the local state to reflect the change
       setBudgetData(prevData =>
         prevData.map(item =>
           item.id === expenseId ? { ...item, Status: "Approved" } : item
         )
       );
   
-      // Close the modal
       setShowApproveModal(false);
   
       toast.success("Expense approved successfully!");
     } catch (err) {
       console.error("Error approving expense:", err);
-      // Show error toast notification
       toast.error("Failed to approve expense. Please try again.");
     }
   };
@@ -96,11 +92,9 @@ const rejectExpense = async (expenseId) => {
       )
     );
 
-    // Close the modal and reset the reason
     setShowRejectModal(false);
     setRejectReason("");
 
-    // Show success toast notification
     toast.success("Expense rejected successfully!");
   } catch (err) {
     console.error("Error rejecting expense:", err);
@@ -108,7 +102,6 @@ const rejectExpense = async (expenseId) => {
   }
 };
 
-  // Filtering logic
   const filteredData = budgetData.filter((item) => {
     const matchesTab =
       activeTab === "All Budgets" ||
@@ -128,13 +121,11 @@ const rejectExpense = async (expenseId) => {
     return matchesTab && matchesSearch;
   });
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Action handlers
   const handleBudgetClick = (budget) => {
     setSelectedBudget(budget);
     setShowDetailModal(true);
@@ -178,7 +169,6 @@ const rejectExpense = async (expenseId) => {
     return null;
   };
 
-  // Pagination rendering
   const renderPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 3;
