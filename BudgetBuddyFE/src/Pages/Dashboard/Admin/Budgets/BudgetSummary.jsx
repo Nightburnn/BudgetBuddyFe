@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_URL } from '../../../../config/api';
 
 
 const TotalBudgetIcon = () => (
@@ -45,30 +47,75 @@ const RejectedIcon = () => (
   <path d="M18 11.375C18 11.5975 17.934 11.815 17.8104 12C17.6868 12.185 17.5111 12.3292 17.3055 12.4144C17.1 12.4995 16.8738 12.5218 16.6555 12.4784C16.4373 12.435 16.2368 12.3278 16.0795 12.1705C15.9222 12.0132 15.815 11.8127 15.7716 11.5945C15.7282 11.3762 15.7505 11.15 15.8356 10.9445C15.9208 10.7389 16.065 10.5632 16.25 10.4396C16.435 10.316 16.6525 10.25 16.875 10.25C17.1734 10.25 17.4595 10.3685 17.6705 10.5795C17.8815 10.7905 18 11.0766 18 11.375ZM14.25 6.5H10.5C10.3011 6.5 10.1103 6.57902 9.96967 6.71967C9.82902 6.86032 9.75 7.05109 9.75 7.25C9.75 7.44891 9.82902 7.63968 9.96967 7.78033C10.1103 7.92098 10.3011 8 10.5 8H14.25C14.4489 8 14.6397 7.92098 14.7803 7.78033C14.921 7.63968 15 7.44891 15 7.25C15 7.05109 14.921 6.86032 14.7803 6.71967C14.6397 6.57902 14.4489 6.5 14.25 6.5ZM23.25 11V14C23.25 14.5967 23.0129 15.169 22.591 15.591C22.169 16.0129 21.5967 16.25 21 16.25H20.7788L19.2591 20.5044C19.155 20.7958 18.9634 21.0479 18.7105 21.2261C18.4575 21.4044 18.1557 21.5 17.8463 21.5H16.6538C16.3443 21.5 16.0425 21.4044 15.7895 21.2261C15.5366 21.0479 15.345 20.7958 15.2409 20.5044L15.0609 20H9.68906L9.50906 20.5044C9.40502 20.7958 9.2134 21.0479 8.96047 21.2261C8.70754 21.4044 8.40568 21.5 8.09625 21.5H6.90375C6.59433 21.5 6.29246 21.4044 6.03953 21.2261C5.7866 21.0479 5.59498 20.7958 5.49094 20.5044L4.3125 17.2081C3.19142 15.9393 2.48945 14.3553 2.3025 12.6725C2.06046 12.7996 1.85777 12.9905 1.71633 13.2245C1.57489 13.4584 1.50009 13.7266 1.5 14C1.5 14.1989 1.42098 14.3897 1.28033 14.5303C1.13968 14.671 0.948912 14.75 0.75 14.75C0.551088 14.75 0.360322 14.671 0.21967 14.5303C0.0790176 14.3897 0 14.1989 0 14C0.00114598 13.3312 0.225771 12.6819 0.638188 12.1553C1.05061 11.6287 1.62716 11.2551 2.27625 11.0938C2.4438 9.02687 3.38252 7.09859 4.90601 5.6918C6.42951 4.28502 8.42634 3.50263 10.5 3.5H20.25C20.4489 3.5 20.6397 3.57902 20.7803 3.71967C20.921 3.86032 21 4.05109 21 4.25C21 4.44891 20.921 4.63968 20.7803 4.78033C20.6397 4.92098 20.4489 5 20.25 5H18.2447C19.4894 5.87328 20.4683 7.07378 21.0731 8.46875C21.1134 8.5625 21.1528 8.65625 21.1903 8.75C21.7535 8.7978 22.278 9.0558 22.6596 9.47268C23.0413 9.88957 23.252 10.4348 23.25 11ZM21.75 11C21.75 10.8011 21.671 10.6103 21.5303 10.4697C21.3897 10.329 21.1989 10.25 21 10.25H20.6569C20.4971 10.2502 20.3415 10.1993 20.2127 10.1049C20.0839 10.0105 19.9885 9.87738 19.9406 9.725C19.5109 8.35375 18.6542 7.15571 17.4956 6.3057C16.337 5.45569 14.937 4.99821 13.5 5H10.5C9.19005 4.99993 7.90838 5.38103 6.81128 6.09682C5.71419 6.81261 4.84907 7.83217 4.32143 9.03115C3.79379 10.2301 3.62643 11.5568 3.83975 12.8492C4.05308 14.1417 4.63787 15.3442 5.52281 16.31C5.59048 16.3836 5.64276 16.47 5.67656 16.5641L6.90375 20H8.09625L8.45438 18.9978C8.50637 18.8522 8.60211 18.7262 8.72848 18.6371C8.85485 18.548 9.00568 18.5001 9.16031 18.5H15.5897C15.7443 18.5001 15.8951 18.548 16.0215 18.6371C16.1479 18.7262 16.2436 18.8522 16.2956 18.9978L16.6538 20H17.8463L19.5441 15.2478C19.5961 15.1022 19.6918 14.9762 19.8182 14.8871C19.9445 14.798 20.0954 14.7501 20.25 14.75H21C21.1989 14.75 21.3897 14.671 21.5303 14.5303C21.671 14.3897 21.75 14.1989 21.75 14V11Z" fill="#F44336"/>
 </svg>
 );
+
 const BudgetSummary = () => {
-  const totalBudget = {
-    title: 'Total Budgets',
-    count: 50,
-    icon: TotalBudgetIcon,
-    className: 'total-card'
+  const [totalBudget, setTotalBudget] = useState({
+    count: 0,
+    title: 'Total Budget Expenses',
+    className: 'total-card',
+  });
+
+  const [statusCounts, setStatusCounts] = useState({
+    Pending: 0,
+    Approved: 0,
+    Rejected: 0
+  });
+
+  const fetchTotalBudget = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-budget-count`);
+      console.log("this is budget card:", response.data)
+      setTotalBudget(prev => ({
+        ...prev,
+        count: response.data
+      }));
+    } catch (error) {
+      console.error('Error fetching total budget:', error);
+      setTotalBudget(prev => ({
+        ...prev,
+        count: 0
+      }));
+    }
   };
 
+  const fetchStatusCount = async (status) => {
+    try {
+      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-budget-count?status=${status}`);
+      setStatusCounts(prev => ({
+        ...prev,
+        [status]: response.data
+      }));
+    } catch (error) {
+      console.error(`Error fetching ${status} count:`, error);
+      setStatusCounts(prev => ({
+        ...prev,
+        [status]: 0
+      }));
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalBudget();
+    ['Pending', 'Approved', 'Rejected'].forEach(fetchStatusCount);
+  }, []);
+
+  
   const statusCards = [
     {
       title: 'Pending',
-      count: 5,
-      icon:  PendingIcon,
+      count: statusCounts.Pending,
+      icon: PendingIcon,
       className: 'pending-card'
     },
     {
       title: 'Approved',
-      count: 35,
+      count: statusCounts.Approved,
       icon: ApprovedIcon,
       className: 'approved-card'
     },
     {
       title: 'Rejected',
-      count: 10,
+      count: statusCounts.Rejected,
       icon: RejectedIcon,
       className: 'rejected-card'
     }
@@ -86,7 +133,7 @@ const BudgetSummary = () => {
                 <p className="card-title">{totalBudget.title}</p>
               </div>
               <div className="card-icon">
-                <totalBudget.icon size={20} />
+                {TotalBudgetIcon && <TotalBudgetIcon size={20} />}
               </div>
             </div>
           </div>
@@ -105,7 +152,7 @@ const BudgetSummary = () => {
                         <p className="card-title">{card.title}</p>
                       </div>
                       <div className="card-icon">
-                        <card.icon size={20} />
+                        {card.icon && <card.icon size={20} />}
                       </div>
                     </div>
                   </div>

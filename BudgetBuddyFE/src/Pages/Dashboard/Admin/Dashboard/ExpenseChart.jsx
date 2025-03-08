@@ -3,7 +3,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import axios from 'axios';
 import { API_URL } from '../../../../config/api';
 
-
 const ExpenseChart = () => {
   const [viewType, setViewType] = useState('Monthly');
   const [monthlyData, setMonthlyData] = useState([]);
@@ -15,7 +14,7 @@ const ExpenseChart = () => {
     const fetchExpenseData = async () => {
       try {
         // Single API endpoint with query parameter for data type
-        const response = await axios.get(`${API_URL}/api/expenses`, {
+        const response = await axios.get(`${API_URL}/admin/dashboard/get-expense-chart`, {
           params: { type: 'all' }
         });
 
@@ -24,7 +23,7 @@ const ExpenseChart = () => {
           response.data.monthly && response.data.monthly.length > 0
             ? response.data.monthly.map(item => ({
                 name: item.month,
-                amount: item.totalExpense
+                amount: item.amount // Corrected property name
               }))
             : [] // Empty array if no data
         );
@@ -33,8 +32,8 @@ const ExpenseChart = () => {
         setYearlyData(
           response.data.yearly && response.data.yearly.length > 0
             ? response.data.yearly.map(item => ({
-                name: item.year,
-                amount: item.totalExpense
+                name: item.year.toString(), // Ensure year is a string
+                amount: item.amount // Corrected property name
               }))
             : [] // Empty array if no data
         );
@@ -53,6 +52,8 @@ const ExpenseChart = () => {
   if (error) return <div>Error: {error}</div>;
 
   const data = viewType === 'Monthly' ? monthlyData : yearlyData;
+
+  console.log("this is the expense chart data:", data);
   
   // Create empty data for when there's no data
   // This ensures the chart is still displayed but empty

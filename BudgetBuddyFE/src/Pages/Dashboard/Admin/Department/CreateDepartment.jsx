@@ -3,7 +3,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from '../../../../config/api';
 
-
 const CreateDepartment = () => {
   const [showModal, setShowModal] = useState(false);
   const [departmentName, setDepartmentName] = useState('');
@@ -18,44 +17,41 @@ const CreateDepartment = () => {
 
   const handleSubmit = async () => {
     if (!isFormValid) return;
-    
+
     setIsLoading(true);
-    
+
     try {
-      // Prepare data in the format expected by the backend
+      // Prepare data with departments set automatically
       const requestData = {
         departments: [departmentName]
       };
-      
-      // Replace with your actual API endpoint
+
+      console.log('Request Data:', requestData);
+
       const response = await fetch(`${API_URL}/departments/create`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          // Add any auth headers if needed
-          // 'Authorization': 'Bearer YOUR_TOKEN'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(requestData)
       });
-      
+
       if (!response.ok) {
         throw new Error(`Failed to create department: ${response.status} ${response.statusText}`);
       }
-      
-      // Check if there's content before trying to parse JSON
+
       const contentType = response.headers.get('content-type');
       let data;
-      
+
       if (contentType && contentType.includes('application/json') && response.status !== 204) {
         const text = await response.text();
         data = text ? JSON.parse(text) : {};
       } else {
-        // Handle non-JSON or empty responses
         data = { success: true };
       }
-      
+
       console.log('API Response:', data);
-      
+
       toast.success('Department created successfully!', {
         position: "top-right",
         autoClose: 3000,
@@ -66,7 +62,7 @@ const CreateDepartment = () => {
         progress: undefined,
         theme: "light",
       });
-      
+
       setShowModal(false);
       setDepartmentName('');
     } catch (error) {
@@ -85,6 +81,7 @@ const CreateDepartment = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <ToastContainer

@@ -30,11 +30,9 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     console.log("Original login response:", userData);
     
-    // IMPORTANT: Store the original response directly without modification
     localStorage.setItem("user", JSON.stringify(userData));
     setCurrentUser(userData);
     
-    // Double-check what was stored
     console.log("User stored in localStorage:", JSON.parse(localStorage.getItem("user")));
     
     // Redirect based on roles or isAdmin flag

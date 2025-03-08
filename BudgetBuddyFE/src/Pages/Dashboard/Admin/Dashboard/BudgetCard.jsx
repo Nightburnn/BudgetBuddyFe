@@ -32,33 +32,26 @@ const BudgetCard = () => {
     const fetchMetrics = async () => {
       setIsLoading(true);
       try {
-        // Ensure API_URL is correct
-        console.log('Fetching from URL:', `${API_URL}/admin/dashboard/get-budget-statistics`);
-  
+
         const response = await fetch(`${API_URL}/admin/dashboard/get-budget-statistics`);
   
-        // Log the raw response for debugging
-        console.log('Raw Response:', response);
-  
+       
         if (!response.ok) {
           throw new Error(`Request failed with status: ${response.status}`);
         }
   
-        // Check if the response is JSON
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           throw new Error('Invalid content type. Expected JSON.');
         }
   
-        // Parse JSON response
         const data = await response.json();
-        console.log('Parsed Data:', data);
+        console.log('this is budget card total data:', data);
   
-        // Ensure all required fields are present (fallback to 0 if missing)
         setMetrics({
-          totalBudgets: data?.budgets ?? 0,
-          totalDepartments: data?.departments ?? 0,
-          totalRecurring: data?.recExpenses ?? 0,
+          totalBudgets: data?.budgets ?? 5,
+          totalDepartments: data?.departments ?? 3,
+          totalRecurring: data?.recExpenses ?? 1,
         });
   
         setError(null);

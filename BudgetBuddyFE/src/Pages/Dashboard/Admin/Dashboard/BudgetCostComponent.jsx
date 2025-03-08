@@ -4,42 +4,43 @@ import { API_URL } from '../../../../config/api';
 
 
 const BudgetCostComponent = () => {
-  // State to store the budget total from API
-  const [budgetTotal, setBudgetTotal] = useState("Loading...");
-  // State to track loading status
+  const [budgetTotal, setBudgetTotal] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  // State to track any error
   const [error, setError] = useState(null);
 
-  // Fetch data from API when component mounts
   useEffect(() => {
     const fetchBudgetTotal = async () => {
       try {
         setIsLoading(true);
-        // Replace with your actual API endpoint
-        const response = await fetch(`${API_URL}/admin/dashboard/get-budget-statistics`);
+        const response = await fetch(`${API_URL}/admin/dashboard/get-yearly-budget-total`);
         
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
         
         const data = await response.json();
-        
-        
-        setBudgetTotal(data.total || "N 0 K");
+        console.log("Budget cost component yearly total:", data);
+  
+        const year = Object.keys(data)[0]; 
+        const amount = data[year]; 
+  
+        // Format the amount (e.g., "N 300 K")
+        const formattedAmount = `N ${(amount / 1000).toFixed(0)} K`;
+  
+        setBudgetTotal(formattedAmount);
         setError(null);
       } catch (err) {
         console.error("Failed to fetch budget total:", err);
         setError("Failed to load budget data");
-        // Set a fallback value or keep the loading state
         setBudgetTotal("N/A");
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     fetchBudgetTotal();
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
+
 
   return (
     <div className="container budget-cost-container">

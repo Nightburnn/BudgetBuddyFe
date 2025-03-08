@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import "./style/notifications.css";
+import { API_URL } from '../../../config/api';
+import { useAuth } from "../../../Auth/AuthContext";
 
 const Header = ({ toggleSidebar, isSidebarOpen }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -11,6 +13,8 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const notificationRef = useRef(null);
   const location = useLocation();
+
+  const { currentUser } = useAuth();
 
   const getPageTitle = () => {
     const pathParts = location.pathname.split("/").filter(part => part);
@@ -26,60 +30,39 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
 
     return "Dashboard";
   };
+
   // Fetch notifications from API
   const fetchNotifications = async () => {
+    if (!currentUser || !currentUser.department_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      // Replace with your API endpoint
-      const response = await fetch('/api/notifications');
+      const response = await fetch(`${API_URL}/departments/${currentUser.department_id}/notifications`);
       if (!response.ok) {
         throw new Error('Failed to fetch notifications');
       }
       const data = await response.json();
+      console.log("this is notification data", data);
 
-      // Organize notifications into recent and older
-      const recent = data.filter(notification => !notification.isRead);
-      const older = data.filter(notification => notification.isRead);
+      // Access the recent and older arrays directly from the data object
+      const { recent, older } = data;
+
+      // Check if there are unread notifications in the recent array
+      const hasUnread = recent.some(notification => !notification.isRead);
 
       setNotifications({ recent, older });
-      setHasUnreadNotifications(recent.length > 0);
+      setHasUnreadNotifications(hasUnread);
       setError(null);
     } catch (err) {
       setError('Failed to load notifications');
       console.error('Error fetching notifications:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Mark notifications as read
-  const markAsRead = async () => {
-    if (notifications.recent.length === 0) return;
-
-    try {
-      // Replace with your API endpoint
-      const response = await fetch('/api/notifications/mark-read', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          notificationIds: notifications.recent.map(n => n.id)
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to mark notifications as read');
-      }
-
-      // Update local state
-      setNotifications(prev => ({
-        older: [...prev.older, ...prev.recent],
-        recent: []
-      }));
-      setHasUnreadNotifications(false);
-    } catch (err) {
-      console.error('Error marking notifications as read:', err);
     }
   };
 
@@ -103,9 +86,6 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
   // Handle opening notifications panel
   const handleNotificationClick = () => {
     setShowNotifications(!showNotifications);
-    if (!showNotifications && hasUnreadNotifications) {
-      markAsRead();
-    }
   };
 
   return (
@@ -178,12 +158,12 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                                       <div key={notification.id} className="notification-item recent">
                                         <div className="notification-dot-indicator"></div>
                                         <div>
-                                          <h6 className="mb-1">{notification.title}</h6>
+                                          <h6 className="mb-1">{notification.type}</h6>
                                           <p className="mb-1">{notification.message}</p>
                                           <div className="notification-time">
-                                            <span>{notification.time.hours}</span>
+                                            <span>{notification.time}</span>
                                             <span className="time-separator"></span>
-                                            <span>{notification.time.date}</span>
+                                            <span>{notification.date}</span>
                                           </div>
                                         </div>
                                       </div>
@@ -198,12 +178,12 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
                                       <div key={notification.id} className="notification-item older">
                                         <div className="notification-dot-indicator"></div>
                                         <div>
-                                          <h6 className="mb-1">{notification.title}</h6>
+                                          <h6 className="mb-1">{notification.type}</h6>
                                           <p className="mb-1">{notification.message}</p>
                                           <div className="notification-time">
-                                            <span>{notification.time.hours}</span>
+                                            <span>{notification.time}</span>
                                             <span className="time-separator"></span>
-                                            <span>{notification.time.date}</span>
+                                            <span>{notification.date}</span>
                                           </div>
                                         </div>
                                       </div>

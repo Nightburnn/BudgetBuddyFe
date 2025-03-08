@@ -212,7 +212,7 @@ const ForgotPassword = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       
       <div className="signup-image">
-        <img src={bb} alt="Safe" className="img-fluid" />
+        <img src={bb} alt="Safe" className="img-fluid" loading="lazy" />
       </div>
 
       <div className="signup-form-container d-flex flex-column justify-content-center">
