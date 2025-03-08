@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Signup.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useNavigate } from 'react-router-dom';
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import bb from "../assests/images/bb.png";
+import bb from "../assests/images/bb.webp";
 import { API_URL } from '../config/api';
 
 const Signup = () => {
@@ -20,6 +22,7 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [departments, setDepartments] = useState([]);
+  const navigate = useNavigate();
 
   // OTP verification state
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -157,7 +160,7 @@ const Signup = () => {
 
       toast.success("Registration successful! Redirecting to login...");
       setTimeout(() => {
-        window.location.href = "/login";
+        navigate('/login');
       }, 3000);
 
     } catch (error) {

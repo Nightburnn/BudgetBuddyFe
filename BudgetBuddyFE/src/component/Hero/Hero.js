@@ -24,6 +24,7 @@ const Hero = () => {
               src={ill}
               alt="Illustration"
               className="img-fluid illustration-img"
+              loading="lazy"
             />
           </div>
         </div>

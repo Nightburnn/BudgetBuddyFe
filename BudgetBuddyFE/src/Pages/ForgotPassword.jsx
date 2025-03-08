@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
-import bb from "../assests/images/bb.png";
+import bb from "../assests/images/bb.webp";
 import "./Signup.css";
 import { API_URL } from '../config/api';
 

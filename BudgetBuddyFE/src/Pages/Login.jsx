@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';  
 import 'react-toastify/dist/ReactToastify.css';         
-import bb from "../assests/images/bb.png";
+import bb from "../assests/images/bb.webp";
 import { useAuth } from "../Auth/AuthContext"; 
 import { API_URL } from '../config/api';
 
