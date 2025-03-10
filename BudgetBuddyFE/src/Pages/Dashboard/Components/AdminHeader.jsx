@@ -133,7 +133,7 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
 
                         <div className="notification-content">
                           {loading ? (
-                            <div className="p-3 text-center">Loading...</div>
+                            <div className="p-3 text-center">Loading....</div>
                           ) : error ? (
                             <div className="p-3 text-center text-danger">{error}</div>
                           ) : (
