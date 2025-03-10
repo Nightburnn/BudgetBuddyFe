@@ -5,6 +5,9 @@ import { Dropdown } from "react-bootstrap";
 import { toast, ToastContainer } from 'react-toastify';
 import axios from "axios";
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
+
 
 
 const RecurringList = () => {
@@ -20,16 +23,26 @@ const RecurringList = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
+   
+        const { currentUser } = useAuth();
 
   useEffect(() => {
     fetchRecurringExpenses();
   }, []);
 
   const fetchRecurringExpenses = async () => {
+     if (!currentUser || !currentUser.organization_id) {
+                console.error("No departmentId found in currentUser");
+                setError("No department ID found. Please log in again.");
+                setLoading(false);
+                return;
+              }
+               
+              const org_id = currentUser.organization_id;
     try {
       setLoading(true);
       console.log("Fetching recurring expenses...");
-      const response = await axios.get(`${API_URL}/recurringexpenses`);
+      const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-total-recurring-expense-list`);
       console.log("Recurring expenses data received:", response.data);
 
       const transformedData = response.data.map(item => ({

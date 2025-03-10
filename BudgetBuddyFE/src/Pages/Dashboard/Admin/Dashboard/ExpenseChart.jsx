@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 const ExpenseChart = () => {
   const [viewType, setViewType] = useState('Monthly');
@@ -10,10 +12,22 @@ const ExpenseChart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
+        const { currentUser } = useAuth();
+
   useEffect(() => {
     const fetchExpenseData = async () => {
+              if (!currentUser || !currentUser.organization_id) {
+                  console.error("No departmentId found in currentUser");
+                  setError("No department ID found. Please log in again.");
+                  setLoading(false);
+                  return;
+                }
+                 
+                const org_id = currentUser.organization_id;
+         
       try {
-        const response = await axios.get(`${API_URL}/admin/dashboard/get-expense-chart`, {
+        const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-expense-chart`, {
           params: { type: 'all' }
         });
 

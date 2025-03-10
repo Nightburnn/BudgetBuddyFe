@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 
 const TotalBudgetIcon = () => (
@@ -60,10 +62,21 @@ const BudgetSummary = () => {
     Approved: 0,
     Rejected: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+    const { currentUser } = useAuth();
 
   const fetchTotalBudget = async () => {
+    if (!currentUser || !currentUser.organization_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+     
+    const org_id = currentUser.organization_id;
     try {
-      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-budget-count`);
+      const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-total-budget-count`);
       console.log("this is budget card:", response.data)
       setTotalBudget(prev => ({
         ...prev,
@@ -79,8 +92,17 @@ const BudgetSummary = () => {
   };
 
   const fetchStatusCount = async (status) => {
+    if (!currentUser || !currentUser.organization_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+     
+    const org_id = currentUser.organization_id;
+
     try {
-      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-budget-count?status=${status}`);
+      const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-total-budget-count?status=${status}`);
       setStatusCounts(prev => ({
         ...prev,
         [status]: response.data

@@ -3,7 +3,9 @@ import { Search } from "lucide-react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import CreateDepartment from './CreateDepartment'
 import { API_URL } from '../../../../config/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast} from 'react-toastify';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 
 const DepartmentList = () => {
@@ -16,11 +18,24 @@ const DepartmentList = () => {
 
   const itemsPerPage = 10;
 
+  const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+      const { currentUser } = useAuth();
+
   useEffect(() => {
     const fetchDepartments = async () => {
+        if (!currentUser || !currentUser.organization_id) {
+            console.error("No departmentId found in currentUser");
+            setError("No department ID found. Please log in again.");
+            setLoading(false);
+            return;
+          }
+           
+          const org_id = currentUser.organization_id;
+   
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/departments`);
+        const response = await fetch(`${API_URL}/admin/${org_id}/departments`);
         const data = await response.json();
         console.log("Fetched departments:", data); 
         const transformedData = data.map(dept => ({

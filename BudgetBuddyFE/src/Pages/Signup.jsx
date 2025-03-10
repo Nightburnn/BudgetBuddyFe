@@ -24,6 +24,11 @@ const Signup = () => {
   const [departments, setDepartments] = useState([]);
   const navigate = useNavigate();
 
+  // New state for organization
+  const [organization, setOrganization] = useState("");
+    const [organizationsList, setOrganizationsList] = useState([]);
+  const [organizationError, setOrganizationError] = useState("");
+
   // OTP verification state
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(480);
@@ -45,7 +50,7 @@ const Signup = () => {
   // OTP Timer effect
   useEffect(() => {
     let interval;
-    if (step === 4 && timer > 0) {
+    if (step === 5 && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => {
           if (prev <= 1) {
@@ -60,71 +65,151 @@ const Signup = () => {
     return () => clearInterval(interval);
   }, [step, timer]);
 
+  // Fetch departments based on selected organization for HOD
   useEffect(() => {
     const fetchDepartments = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/departments`);
+      if (selectedRole === "hod" && organization) {
+        try {
+          const response = await axios.get(`${API_URL}/departments?organizationName=${organization}`);
 
-        if (Array.isArray(response.data)) {
-          const validDepartments = response.data.map(({ id, name }) => ({
-            id,
-            name: name.trim(),
-          }));
+          if (Array.isArray(response.data)) {
+            const validDepartments = response.data.map(({ id, name }) => ({
+              id,
+              name: name.trim(),
+            }));
 
-          console.log("Fetched departments:", validDepartments);
-          setDepartments(validDepartments);
-        } else {
-          console.error("Unexpected response structure:", response.data);
+            console.log("Fetched departments:", validDepartments);
+            setDepartments(validDepartments);
+          } else {
+            console.error("Unexpected response structure:", response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching departments:", error);
         }
-      } catch (error) {
-        console.error("Error fetching departments:", error);
       }
     };
 
-    fetchDepartments();
-  }, []);
+    if (organization) {
+      fetchDepartments();
+    }
+  }, [organization, selectedRole]);
 
-  const handleNext = () => {
-    if (step === 1) {
-      if (selectedRole === "admin") {
-        setStep(3);
-      } else if (selectedRole === "hod") {
-        setStep(2);
+  // Fetch organizations list for HOD validation
+  useEffect(() => {
+  const fetchOrganizations = async () => {
+    if (selectedRole === "hod") {
+      try {
+        const response = await axios.get(`${API_URL}/organizations/get`);
+        console.log("Raw response:", response.data);
+        
+        // Handle object format with ID keys
+        if (typeof response.data === 'object' && !Array.isArray(response.data)) {
+          // Convert object to array format
+          const organizationsArray = Object.entries(response.data)
+            .filter(([_, name]) => name !== null) // Remove null entries
+            .map(([id, name]) => ({ id: parseInt(id), name }));
+          
+          console.log("Converted organizations:", organizationsArray);
+          setOrganizationsList(organizationsArray);
+        } 
+        // Handle array format (just in case API changes in future)
+        else if (Array.isArray(response.data)) {
+          console.log("Fetched organizations array:", response.data);
+          setOrganizationsList(response.data);
+        } 
+        else {
+          console.error("Unexpected response structure:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching organizations:", error);
       }
-    } else if (step === 2 && isNextButtonEnabledStep2) {
-      setStep(3);
-    } else if (step === 3 && isFormValidStep3) {
-      handleSignup();
     }
   };
 
+  if (selectedRole === "hod" && step === 2) {
+    fetchOrganizations();
+  }
+}, [selectedRole, step]);
+
+const handleNext = () => {
+  if (step === 1) {
+    if (selectedRole) {
+      setStep(2);
+    }
+  } else if (step === 2) {
+    // Organization validation step
+    if (selectedRole === "admin" && organization.trim() !== "") {
+      setStep(3); // Go to Step 3 for admin (email and password now)
+    } else if (selectedRole === "hod") {
+      // Validate if organization exists for HOD
+      const orgExists = organizationsList.some(
+        org => org.name.toLowerCase() === organization.toLowerCase()
+      );
+      
+      if (orgExists) {
+        setOrganizationError("");
+        setStep(3); // Go to personal details for HOD
+      } else {
+        // Suggest similar organization if possible
+        const similarOrg = organizationsList.find(org => 
+          org.name.toLowerCase().includes(organization.toLowerCase()) ||
+          organization.toLowerCase().includes(org.name.toLowerCase())
+        );
+        
+        if (similarOrg) {
+          setOrganizationError(`Organization not found. Did you mean "${similarOrg.name}"?`);
+        } else {
+          setOrganizationError("Organization not found. Please check and try again.");
+        }
+      }
+    }
+  } else if (step === 3) {
+    if (selectedRole === "admin") {
+      // For admin, validate email and password in step 3 and proceed to signup
+      if (email.trim() !== "" && validateEmail(email) && 
+          password.trim() !== "" && confirmPassword.trim() !== "" && 
+          password === confirmPassword && validatePassword(password)) {
+        handleSignup();
+      }
+    } else if (selectedRole === "hod" && isNextButtonEnabledStep3) {
+      // For HOD, validate personal details and go to step 4
+      setStep(4);
+    }
+  } else if (step === 4) {
+    // This would be for HOD only since admin flow completes at step 3
+    if (selectedRole === "hod" && password.trim() !== "" && 
+        confirmPassword.trim() !== "" && password === confirmPassword && 
+        validatePassword(password)) {
+      handleSignup();
+    }
+  }
+}
+
   const handleBack = () => {
-    if (selectedRole === "admin" && step === 3) {
-      setStep(1);
-    } else if (step > 1) {
+    if (step > 1) {
       setStep(step - 1);
     }
   };
 
-  const isNextButtonEnabledStep2 =
+  const isNextButtonEnabledStep2 = organization.trim() !== "";
+
+  const isNextButtonEnabledStep3 =
     firstName.trim() !== "" &&
     lastName.trim() !== "" &&
     email.trim() !== "" &&
     validateEmail(email);
 
-  const isFormValidStep3 =
+  const isFormValidStep4 =
     selectedRole === "admin"
-      ? email.trim() !== "" &&
-      validateEmail(email) &&
-      password.trim() !== "" &&
-      confirmPassword.trim() !== "" &&
-      password === confirmPassword &&
-      validatePassword(password)
+      ? password.trim() !== "" &&
+        confirmPassword.trim() !== "" &&
+        password === confirmPassword &&
+        validatePassword(password)
       : department !== "" &&
-      password.trim() !== "" &&
-      confirmPassword.trim() !== "" &&
-      password === confirmPassword &&
-      validatePassword(password);
+        password.trim() !== "" &&
+        confirmPassword.trim() !== "" &&
+        password === confirmPassword &&
+        validatePassword(password);
 
   const handleRoleSelect = (role) => setSelectedRole(role);
 
@@ -218,6 +303,9 @@ const Signup = () => {
       const userData = {
         email,
         password,
+        ...(selectedRole === "admin" && {
+          organizationName: organization
+                }),
         ...(selectedRole === "hod" && {
           firstName,
           lastName,
@@ -230,7 +318,7 @@ const Signup = () => {
       console.log("Signup response:", response.data);
 
       // Move to OTP verification step after successful signup
-      setStep(4);
+      setStep(5);
       setTimer(480);
       setShowResend(false);
       toast.success("Registration initiated! Please verify your email with OTP.");
@@ -369,39 +457,40 @@ const Signup = () => {
         )}
 
         {step === 2 && (
-          <div className="form-step second">
+          <div className="form-step">
             <div className="form-group mb-3">
-              <label>First Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-            </div>
-            <div className="form-group mb-3">
-              <label>Last Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label>Email Address</label>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              {selectedRole === "admin" ? (
+                <>
+                  <label>Create Organization</label>
+                  <input
+                    type="text"
+                    className="form-control mt-3"
+                    placeholder="Enter organization name"
+                    value={organization}
+                    onChange={(e) => setOrganization(e.target.value)}
+                                      />
+                </>
+              ) : (
+                <>
+                  <label>Join Organization</label>
+                  <input
+                    type="text"
+                    className={`form-control mb-3 ${organizationError ? "is-invalid" : ""}`}
+                    placeholder="Enter organization name to join"
+                    value={organization}
+                    onChange={(e) => {
+                      setOrganization(e.target.value);
+                      setOrganizationError("");
+                    }}
+                  />
+                  {organizationError && (
+                    <div className="invalid-feedback">{organizationError}</div>
+                  )}
+                </>
+              )}
             </div>
             <button
-              className={`btn btn-primary btn-block mt-4 ${isNextButtonEnabledStep2 ? "active" : ""
-                }`}
+              className={`btn btn-primary btn-block mt-4 ${isNextButtonEnabledStep2 ? "active" : ""}`}
               onClick={handleNext}
               disabled={!isNextButtonEnabledStep2}
             >
@@ -409,90 +498,178 @@ const Signup = () => {
             </button>
           </div>
         )}
+{step === 3 && (
+  <div className="form-step second">
+    {selectedRole === "hod" ? (
+      <>
+        <div className="form-group mb-3">
+          <label>First Name</label>
+          <input
+            type="text"
+            className="form-control"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div className="form-group mb-3">
+          <label>Last Name</label>
+          <input
+            type="text"
+            className="form-control"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label>Email Address</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+      </>
+    ) : (
+      // Admin specific fields
+      <>
+        <div className="form-group mb-3">
+          <label>Email Address</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group mt-3 password-field position-relative">
+          <label>Create Password</label>
+          <input
+            type={showPassword ? "text" : "password"}
+            className="form-control"
+            id="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <i
+            className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+            onClick={() => setShowPassword(!showPassword)}
+          ></i>
+        </div>
+        <div className="form-group password-field position-relative mt-3">
+          <label>Confirm Password</label>
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            className="form-control"
+            id="confirm-password"
+            placeholder="Confirm your password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <i
+            className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          ></i>
+        </div>
+        <p className="text-muted mt-2">
+          Minimum of 8 characters, starting with a capital letter and
+          containing a special character (e.g., @, #, $, !).
+        </p>
+      </>
+    )}
+    <button
+      className={`btn btn-primary btn-block mt-4 ${
+        selectedRole === "admin"
+          ? (email.trim() !== "" && validateEmail(email) && 
+             password.trim() !== "" && confirmPassword.trim() !== "" && 
+             password === confirmPassword && validatePassword(password))
+            ? "active"
+            : ""
+          : isNextButtonEnabledStep3
+            ? "active"
+            : ""
+      }`}
+      onClick={handleNext}
+      disabled={
+        selectedRole === "admin"
+          ? !(email.trim() !== "" && validateEmail(email) && 
+              password.trim() !== "" && confirmPassword.trim() !== "" && 
+              password === confirmPassword && validatePassword(password))
+          : !isNextButtonEnabledStep3
+      }
+    >
+      Next
+    </button>
+  </div>
+)}
+{step === 4 && selectedRole === "hod" && (
+  <div className="form-step second">
+    <div className="form-group mb-3">
+      <label>Department</label>
+      <select
+        className="form-control"
+        value={department}
+        onChange={(e) => setDepartment(e.target.value)}
+      >
+        <option value="">Select Department</option>
+        {departments.map((dept) => (
+          <option key={dept.id} value={dept.id}>
+            {dept.name}
+          </option>
+        ))}
+      </select>
+    </div>
 
-        {step === 3 && (
-          <div className="form-step second">
-            {selectedRole === "hod" && (
-              <div className="form-group mb-3">
-                <label>Department</label>
-                <select
-                  className="form-control"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>
-                      {dept.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+    <div className="form-group mt-3 password-field position-relative">
+      <label>Create Password</label>
+      <input
+        type={showPassword ? "text" : "password"}
+        className="form-control"
+        id="password"
+        placeholder="Enter your password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <i
+        className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+        onClick={() => setShowPassword(!showPassword)}
+      ></i>
+    </div>
+    <div className="form-group password-field position-relative mt-3">
+      <label>Confirm Password</label>
+      <input
+        type={showConfirmPassword ? "text" : "password"}
+        className="form-control"
+        id="confirm-password"
+        placeholder="Confirm your password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+      />
+      <i
+        className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"} toggle-password`}
+        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      ></i>
+    </div>
+    <p className="text-muted mt-2">
+      Minimum of 8 characters, starting with a capital letter and
+      containing a special character (e.g., @, #, $, !).
+    </p>
 
-            {selectedRole === "admin" && (
-              <div className="form-group mb-3">
-                <label>Email Address</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-            )}
-
-            <div className="form-group mt-3 password-field position-relative">
-              <label>Create Password</label>
-              <input
-                type={showPassword ? "text" : "password"}
-                className="form-control"
-                id="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <i
-                className={`bi ${showPassword ? "bi-eye-slash" : "bi-eye"
-                  } toggle-password`}
-                onClick={() => setShowPassword(!showPassword)}
-              ></i>{" "}
-            </div>
-            <div className="form-group password-field position-relative mt-3">
-              <label>Confirm Password</label>
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                className="form-control"
-                id="confirm-password"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <i
-                className={`bi ${showConfirmPassword ? "bi-eye-slash" : "bi-eye"
-                  } toggle-password`}
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              ></i>
-            </div>
-            <p className="text-muted mt-2">
-              Minimum of 8 characters, starting with a capital letter and
-              containing a special character (e.g., @, #, $, !).
-            </p>
-
-            <button
-              className={`btn btn-primary btn-block mt-3 ${isFormValidStep3 ? "active" : ""
-                }`}
-              disabled={!isFormValidStep3 || isLoading}
-              onClick={handleNext}
-            >
-              {isLoading ? <span>Signing Up...</span> : "Sign Up"}
-            </button>
-          </div>
-        )}
-
-        {step === 4 && (
+    <button
+      className={`btn btn-primary btn-block mt-3 ${isFormValidStep4 ? "active" : ""}`}
+      disabled={!isFormValidStep4 || isLoading}
+      onClick={handleNext}
+    >
+      {isLoading ? <span>Signing Up...</span> : "Sign Up"}
+    </button>
+  </div>
+)}
+        {step === 5 && (
           <div className="form-step forgotpass">
             <p className="text-center right mb-4 main-highlight">
               Enter the 6-digit OTP sent to <span className="highlight-email">{email}</span>

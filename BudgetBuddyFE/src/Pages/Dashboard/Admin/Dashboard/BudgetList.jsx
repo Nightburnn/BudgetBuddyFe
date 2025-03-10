@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Search } from "lucide-react";
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
+
 
 const BudgetList = () => {
   const [budgetData, setBudgetData] = useState([]);
@@ -12,11 +15,22 @@ const BudgetList = () => {
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
+
+      const { currentUser } = useAuth();
+
   useEffect(() => {
     const fetchBudgetData = async () => {
+      if (!currentUser || !currentUser.organization_id) {
+        console.error("No departmentId found in currentUser");
+        setError("No department ID found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+       
+      const org_id = currentUser.organization_id;
       try {
         console.log("Fetching budget data from API...");
-        const response = await fetch(`${API_URL}/budgets`);
+        const response = await fetch(`${API_URL}/admin/${org_id}/dashboard/get-total-budget-list`);
 
         if (!response.ok) {
           throw new Error(`API request failed with status ${response.status}`);

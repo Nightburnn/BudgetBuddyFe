@@ -4,7 +4,8 @@ import { Bell, MoreVertical } from 'lucide-react';
 import axios from 'axios';
 import "./style/notificationAdmin.css";
 import { API_URL } from '../../../config/api';
-import { toast, ToastContainer } from 'react-toastify';
+import { useAuth } from "../../../Auth/AuthContext";
+
 
 const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -13,9 +14,10 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
   const [error, setError] = useState(null);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
   const [activeNotificationId, setActiveNotificationId] = useState(null);
-
   const notificationRef = useRef(null);
   const location = useLocation();
+  const { currentUser } = useAuth();
+
 
   const getPageTitle = () => {
     const pathParts = location.pathname.split("/").filter(part => part);
@@ -25,9 +27,17 @@ const AdminHeader = ({ toggleSidebar, isSidebarOpen }) => {
   };
 
   const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`${API_URL}/admin/notifications`);
+  if (!currentUser || !currentUser.organization_id) {
+            console.error("No Organization found in currentUser");
+            setError("No department ID found. Please log in again.");
+            setLoading(false);
+            return;
+          }
+           
+          const org_id = currentUser.organization_id;
+          console.log("this is the org_id:", org_id);
+          try {
+      const response = await axios.get(`${API_URL}/admin/${org_id}/notifications`);
       setNotifications(response.data);
       console.log("this is the notification:", response.data);
   

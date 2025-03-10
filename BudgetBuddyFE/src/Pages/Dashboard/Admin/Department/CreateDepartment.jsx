@@ -2,12 +2,20 @@ import React, { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 const CreateDepartment = () => {
   const [showModal, setShowModal] = useState(false);
   const [departmentName, setDepartmentName] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const { currentUser } = useAuth();
+
+
 
   const handleInputChange = (e) => {
     const value = e.target.value;
@@ -16,9 +24,19 @@ const CreateDepartment = () => {
   };
 
   const handleSubmit = async () => {
+
     if (!isFormValid) return;
 
     setIsLoading(true);
+
+
+    if (!currentUser || !currentUser.organization_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+    const org_id = currentUser.organization_id;
 
     try {
       const requestData = {
@@ -27,7 +45,7 @@ const CreateDepartment = () => {
 
       console.log('Request Data:', requestData);
 
-      const response = await fetch(`${API_URL}/departments/create`, {
+      const response = await fetch(`${API_URL}/departments/create/${org_id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

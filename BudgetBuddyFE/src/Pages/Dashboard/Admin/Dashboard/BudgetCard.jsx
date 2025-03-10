@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './Styles/BudgetCard.css';
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 const MetricCard = ({ title, value, colorClass, isLoading }) => (
   <div className="col-12 col-md-6 col-lg-4 mb-4">
@@ -27,12 +29,23 @@ const BudgetCard = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+   const [loading, setLoading] = useState(true);
+
+  const { currentUser } = useAuth();
+
   useEffect(() => {
     const fetchMetrics = async () => {
-      setIsLoading(true);
+      if (!currentUser || !currentUser.organization_id) {
+        console.error("No departmentId found in currentUser");
+        setError("No department ID found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+       
+      const org_id = currentUser.organization_id;      
       try {
 
-        const response = await fetch(`${API_URL}/admin/dashboard/get-budget-statistics`);
+        const response = await fetch(`${API_URL}/admin/${org_id}/dashboard/get-budget-statistics`);
   
        
         if (!response.ok) {

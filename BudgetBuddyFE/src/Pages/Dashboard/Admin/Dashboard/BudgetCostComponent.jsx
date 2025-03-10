@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import "./Styles/BudgetCostComponent.css";
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
+
 
 
 const BudgetCostComponent = () => {
   const [budgetTotal, setBudgetTotal] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+   const [loading, setLoading] = useState(true);
+    
+        const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchBudgetTotal = async () => {
+       if (!currentUser || !currentUser.organization_id) {
+              console.error("No Organization found in currentUser");
+              setError("No Organization ID found. Please log in again.");
+              setLoading(false);
+              return;
+            }
+             
+            const org_id = currentUser.organization_id;
       try {
         setIsLoading(true);
-        const response = await fetch(`${API_URL}/admin/dashboard/get-yearly-budget-total`);
+        const response = await fetch(`${API_URL}/admin/${org_id}/dashboard/get-yearly-budget-total`);
         
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);

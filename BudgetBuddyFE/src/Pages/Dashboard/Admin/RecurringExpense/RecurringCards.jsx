@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_URL } from '../../../../config/api';
+import { useAuth } from "../../../../Auth/AuthContext";
 
 
 const TotalBudgetIcon = () => (
@@ -41,8 +42,17 @@ const RecurringCards = () => {
   });
 
   const fetchTotalBudget = async () => {
+    if (!currentUser || !currentUser.organization_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+     
+    const org_id = currentUser.organization_id;
+
     try {
-      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-recurring-expense-count`);
+      const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-total-recurring-expense-count`);
       console.log("this is recurring card:", response.data)
       setTotalBudget(prev => ({
         ...prev,
@@ -57,9 +67,21 @@ const RecurringCards = () => {
     }
   };
 
+  const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+      const { currentUser } = useAuth();
   const fetchStatusCount = async (status) => {
+
+    if (!currentUser || !currentUser.organization_id) {
+      console.error("No departmentId found in currentUser");
+      setError("No department ID found. Please log in again.");
+      setLoading(false);
+      return;
+    }
+     
+    const org_id = currentUser.organization_id;
     try {
-      const response = await axios.get(`${API_URL}/admin/dashboard/get-total-recurring-expense-count?status=${status}`);
+      const response = await axios.get(`${API_URL}/admin/${org_id}/dashboard/get-total-recurring-expense-count?status=${status}`);
       setStatusCounts(prev => ({
         ...prev,
         [status]: response.data
